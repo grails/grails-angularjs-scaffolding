@@ -1,0 +1,40 @@
+//= wrapped
+//= require /angular/angular ${dependencies.collect{ '\n//= require ' + it.value }.join('\n') }
+//= require_self
+//= require_tree services
+//= require_tree controllers
+//= require_tree directives
+//= require_tree domain
+//= require_tree templates
+
+angular.module("${fullName}", [${dependencies.collect{it.key}.join(', ')}])
+    .config(config);
+
+function config(\$stateProvider) {
+    \$stateProvider
+        .state('${propertyName}', {
+            url: "/${propertyName}",
+            abstract: true,
+            template: "<div ui-view></div>"
+        })
+        .state('${propertyName}.list', {
+            url: "",
+            templateUrl: "/${modulePath}/list.html",
+            controller: "${className}ListController"
+        })
+        .state('${propertyName}.create', {
+            url: "/create",
+            templateUrl: "/${modulePath}/create.html",
+            controller: "${className}CreateController"
+        })
+        .state('${propertyName}.edit', {
+            url: "/edit/:id",
+            templateUrl: "/${modulePath}/edit.html",
+            controller: "${className}EditController"
+        })
+        .state('${propertyName}.show', {
+            url: "/show/:id",
+            templateUrl: "/${modulePath}/show.html",
+            controller: "${className}ShowController"
+        });
+}

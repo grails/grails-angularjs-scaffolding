@@ -1,0 +1,22 @@
+<div class="nav" role="navigation">
+    <ul>
+        <li><a ui-sref="index" class="home">Home</a></li>
+        <li><a class="list" ui-sref="${propertyName}">${className} List</a></li>
+        <li><a class="create" ui-sref="${propertyName}.create">New ${className}</a></li>
+    </ul>
+</div>
+<div id="show-part" class="content scaffold-show" role="main">
+    <h1>Show ${className}</h1>
+    <ol class="property-list ${propertyName}">
+        <% fields.each { %>
+        ${it}
+        <% } %>
+    </ol>
+
+    <form ng-submit="vm.delete()">
+        <fieldset class="buttons">
+            <a class="edit" ui-sref="${propertyName}.edit({id: vm.${propertyName}.id})">Edit</a>
+            <input class="delete" type="submit" value="Delete" onclick="return confirm('Are you sure?');" />
+        </fieldset>
+    </form>
+</div>
