@@ -70,14 +70,16 @@ class NgGenerateAllCommand implements GrailsApplicationCommand, ModelBuilder {
 
         File parentModule = file("${basePath}/${model.packagePath}/${model.packageName}.js")
         if (parentModule.exists()) {
-            angularModuleEditor.addDependency(parentModule, model)
+            if (angularModuleEditor.addDependency(parentModule, model)) {
+                addStatus("Added ${moduleName} as a dependency to ${parentModule.name}")
+            }
         }
 
         String controllerName = angularPropertyRenderer.controllerName
 
         render template: template('angular/javascripts/module.js'),
                 destination: file("${basePath}/${modulePath}/${moduleName}.js"),
-                model: model.asMap() << [fullName: moduleName, dependencies: dependencies, modulePath: jsModulePath],
+                model: model.asMap() << [fullName: moduleName, dependencies: dependencies, modulePath: jsModulePath, controllerAs: controllerName],
                 overwrite: true
 
         render template: template('angular/views/create.tpl.html'),

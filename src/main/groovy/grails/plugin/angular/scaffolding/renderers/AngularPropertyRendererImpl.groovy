@@ -7,10 +7,13 @@ import grails.plugin.formfields.BeanPropertyAccessor
 import grails.plugin.formfields.BeanPropertyAccessorFactory
 import grails.plugin.formfields.FormFieldsTemplateService
 import grails.util.GrailsNameUtils
+import groovy.text.GStringTemplateEngine
 import groovy.xml.MarkupBuilder
 import org.grails.buffer.FastStringWriter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.MessageSource
+import org.springframework.context.support.AbstractMessageSource
 
 import javax.annotation.Resource
 import java.sql.Blob
@@ -18,7 +21,7 @@ import java.sql.Blob
 class AngularPropertyRendererImpl implements AngularPropertyRenderer {
 
     @Resource
-    def messageSource
+    MessageSource messageSource
 
     @Autowired
     DomainModelService domainModelService
@@ -29,13 +32,12 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
     @Autowired
     FormFieldsTemplateService formFieldsTemplateService
 
-    @Value('${grails.plugin.angular.scaffolding.controllerName:"vm"}')
+    @Value('${grails.plugin.angular.scaffolding.controllerName:vm}')
     String controllerName
 
     String lineSeparator = System.getProperty("line.separator")
 
     String renderEditEmbedded(def bean, BeanPropertyAccessor property) {
-
         def legendText = resolveMessage(property.labelKeys, property.defaultLabel)
         println property
         def writer = new FastStringWriter()
@@ -187,7 +189,7 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
         writer.toString()
     }
 
-    CharSequence getLabelText(BeanPropertyAccessor property) {
+    String getLabelText(BeanPropertyAccessor property) {
         def labelText
         if (property.labelKeys) {
             labelText = resolveMessage(property.labelKeys, property.defaultLabel)
@@ -198,7 +200,7 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
         labelText
     }
 
-    CharSequence resolveMessage(List<String> keysInPreferenceOrder, String defaultMessage) {
+    String resolveMessage(List<String> keysInPreferenceOrder, String defaultMessage) {
         def message = keysInPreferenceOrder.findResult { key ->
             messageSource.getMessage(key, [].toArray(), defaultMessage, Locale.default) ?: null
         }

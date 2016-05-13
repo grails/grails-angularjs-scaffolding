@@ -21,7 +21,7 @@ interface AngularPropertyRenderer {
 
     String getDisplayWidget(BeanPropertyAccessor property, String controllerName)
 
-    CharSequence getLabelText(BeanPropertyAccessor property)
+    String getLabelText(BeanPropertyAccessor property)
 
-    CharSequence resolveMessage(List<String> keysInPreferenceOrder, String defaultMessage)
+    String resolveMessage(List<String> keysInPreferenceOrder, String defaultMessage)
 }

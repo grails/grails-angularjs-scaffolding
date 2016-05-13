@@ -20,21 +20,21 @@ function config(\$stateProvider) {
         .state('${propertyName}.list', {
             url: "",
             templateUrl: "/${modulePath}/list.html",
-            controller: "${className}ListController"
+            controller: "${className}ListController as ${controllerAs}"
         })
         .state('${propertyName}.create', {
             url: "/create",
             templateUrl: "/${modulePath}/create.html",
-            controller: "${className}CreateController"
+            controller: "${className}CreateController as ${controllerAs}"
         })
         .state('${propertyName}.edit', {
             url: "/edit/:id",
             templateUrl: "/${modulePath}/edit.html",
-            controller: "${className}EditController"
+            controller: "${className}EditController as ${controllerAs}"
         })
         .state('${propertyName}.show', {
             url: "/show/:id",
             templateUrl: "/${modulePath}/show.html",
-            controller: "${className}ShowController"
+            controller: "${className}ShowController as ${controllerAs}"
         });
 }
