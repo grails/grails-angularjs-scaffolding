@@ -10,7 +10,7 @@
         <li ng-repeat="error in ${controllerName ? controllerName + '.' : ''}errors">{{error.message}}</li>
     </ul>
 
-    <form name="save${className}" ng-submit="save${className}()">
+    <form name="save${className}" ng-submit="${controllerName ? controllerName + '.' : ''}save${className}()">
         <fieldset class="form">
             <ng-include src="'/${modulePath}/form.html'"></ng-include>
         </fieldset>

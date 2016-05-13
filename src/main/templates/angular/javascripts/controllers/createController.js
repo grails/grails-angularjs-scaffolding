@@ -5,16 +5,21 @@ angular
     .controller("${className}CreateController", ${className}CreateController);
 
 function ${className}CreateController(${className}, \$state) {
-    var vm = this;
+    var ${controllerAs} = this;
 
-    vm.part = new ${className}();
+    ${controllerAs}.part = new ${className}();
 
-    vm.save${className} = function() {
-        vm.errors = [];
-        vm.${propertyName}.\$save({}, function() {
+    ${controllerAs}.save${className} = function() {
+        ${controllerAs}.errors = [];
+        ${controllerAs}.${propertyName}.\$save({}, function() {
             \$state.go('${propertyName}.list');
         }, function(response) {
-            vm.errors = response.data;
+            var data = response.data;
+            if (!angular.isArray(data)) {
+                ${controllerAs}.errors = [data];
+            } else {
+                ${controllerAs}.errors = data;
+            }
         });
     };
 }

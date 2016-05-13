@@ -106,7 +106,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand, ModelBuilder {
                 overwrite: true
 
 
-        Map artefactParams = model.asMap() << [moduleName: moduleName]
+        Map artefactParams = model.asMap() << [moduleName: moduleName, controllerAs: controllerName]
 
         render template: template('angular/javascripts/controllers/createController.js'),
                 destination: file("${basePath}/${modulePath}/controllers/${model.propertyName}CreateController.js"),

@@ -5,20 +5,25 @@ angular
     .controller("${className}EditController", ${className}EditController);
 
 function ${className}EditController(${className}, \$stateParams, \$state) {
-    var vm = this;
+    var ${controllerAs} = this;
 
     ${className}.get({id: \$stateParams.id}, function(data) {
-        vm.${propertyName} = new ${className}(data);
+        ${controllerAs}.${propertyName} = new ${className}(data);
     }, function() {
-        vm.errors = [{message: "Could not retrieve ${propertyName} with ID " + \$stateParams.id}];
+        ${controllerAs}.errors = [{message: "Could not retrieve ${propertyName} with ID " + \$stateParams.id}];
     });
 
-    vm.update${className} = function() {
-        vm.errors = [];
-        vm.${propertyName}.\$update(function() {
+    ${controllerAs}.update${className} = function() {
+        ${controllerAs}.errors = [];
+        ${controllerAs}.${propertyName}.\$update(function() {
             \$state.go('${propertyName}.list');
         }, function(response) {
-            vm.errors = response.data;
+            var data = response.data;
+            if (!angular.isArray(data)) {
+                ${controllerAs}.errors = [data];
+            } else {
+                ${controllerAs}.errors = data;
+            }
         });
     };
 }
