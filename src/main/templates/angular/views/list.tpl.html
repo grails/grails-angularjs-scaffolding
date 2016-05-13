@@ -9,7 +9,7 @@
         </tr>
         </thead>
         <tbody>
-            <tr ng-class="{'even': \$index%2 == 0, 'odd': \$index%2 == 1}" ng-repeat="${propertyName} in vm.${propertyName}s">
+            <tr ng-class="{'even': \$index%2 == 0, 'odd': \$index%2 == 1}" ng-repeat="${propertyName} in ${controllerName ? controllerName + '.' : ''}${propertyName}s">
                 <% listProperties.each { %>
                 <td>${it.value}</td>
                 <% } %>

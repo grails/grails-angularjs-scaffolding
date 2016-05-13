@@ -201,12 +201,6 @@ class TemplateRendererImpl implements TemplateRenderer {
     Resource template(Object location) {
         Resource f = resource(file("src/main/templates/$location"))
         if (!f?.exists()) {
-            if (file('profile.yml').exists()) {
-                f = resource(file("templates/$location"))
-                if (f.exists()) {
-                    return f
-                }
-            }
             if (!f?.exists()) {
                 return resource("classpath*:META-INF/templates/" + location)
             }

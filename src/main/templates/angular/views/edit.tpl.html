@@ -6,8 +6,8 @@
 </div>
 <div id="create-${propertyName}" class="content scaffold-create" role="main">
     <h1>Edit ${className}</h1>
-    <ul class="errors" role="alert" ng-if="vm.errors">
-        <li ng-repeat="error in vm.errors">{{error.message}}</li>
+    <ul class="errors" role="alert" ng-if="${controllerName ? controllerName + '.' : ''}errors">
+        <li ng-repeat="error in ${controllerName ? controllerName + '.' : ''}errors">{{error.message}}</li>
     </ul>
 
     <form name="save${className}">

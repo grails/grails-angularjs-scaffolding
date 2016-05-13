@@ -26,19 +26,22 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
     @Autowired
     BeanPropertyAccessorFactory beanPropertyAccessorFactory
 
+    @Autowired
+    FormFieldsTemplateService formFieldsTemplateService
+
     @Value('${grails.plugin.angular.scaffolding.controllerName:"vm"}')
     String controllerName
 
     String lineSeparator = System.getProperty("line.separator")
 
-    String renderEmbedded(def bean, BeanPropertyAccessor property) {
+    String renderEditEmbedded(def bean, BeanPropertyAccessor property) {
 
         def legendText = resolveMessage(property.labelKeys, property.defaultLabel)
         println property
         def writer = new FastStringWriter()
         MarkupBuilder markupBuilder = new MarkupBuilder(writer)
         markupBuilder.doubleQuotes = true
-        markupBuilder.fieldset(class: "embedded ${FormFieldsTemplateService.toPropertyNameFormat(property.propertyType)}") {
+        markupBuilder.fieldset(class: "embedded ${formFieldsTemplateService.toPropertyNameFormat(property.propertyType)}") {
             legend(legendText)
             domainModelService.getEditableProperties(property.persistentProperty.component).each { GrailsDomainClassProperty embedded ->
                 mkp.yieldUnescaped(lineSeparator)
@@ -142,11 +145,16 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
         element?.render() ?: ""
     }
 
-    String getDisplayWidget(BeanPropertyAccessor property) {
+    String getDisplayWidget(BeanPropertyAccessor property, String controllerName) {
         "{{${controllerName ? controllerName + "." : ""}${GrailsNameUtils.getPropertyName(property.beanType)}.${property.pathFromRoot}}}"
     }
 
-    String renderDisplay(BeanPropertyAccessor property) {
+
+    String getDisplayWidget(BeanPropertyAccessor property) {
+        getDisplayWidget(property, controllerName)
+    }
+
+    String renderDisplay(def bean, BeanPropertyAccessor property) {
         def writer = new FastStringWriter()
         MarkupBuilder markupBuilder = new MarkupBuilder(writer)
         markupBuilder.doubleQuotes = true
@@ -156,18 +164,22 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
 
                 def persistentProperty = property.persistentProperty
                 if (persistentProperty?.association) {
-      /*              if (persistentProperty.embedded) {
-                        return (attrs.displayStyle == 'table') ? model.value?.toString().encodeAsHTML() :
-                                displayEmbedded(model.value, persistentProperty.component, attrs, templatesFolder)
-                    } else if (persistentProperty.oneToMany || persistentProperty.manyToMany) {
+                    if (persistentProperty.embedded) {
+                        domainModelService.getVisibleProperties(property.persistentProperty.component).each { GrailsDomainClassProperty embedded ->
+                            mkp.yieldUnescaped(lineSeparator)
+                            mkp.yieldUnescaped renderDisplay(bean, beanPropertyAccessorFactory.accessorFor(bean, "${property.pathFromRoot}.${embedded.name}"))
+                        }
+                    }
+                    /* else if (persistentProperty.oneToMany || persistentProperty.manyToMany) {
                         return displayAssociationList(model.value, persistentProperty.referencedDomainClass)
                     } else {
                         return displayAssociation(model.value, persistentProperty.referencedDomainClass)
                     }*/
-                    null
+                } else {
+                    span(getDisplayWidget(property))
                 }
 
-                span(getDisplayWidget(property))
+
 
             }
         }

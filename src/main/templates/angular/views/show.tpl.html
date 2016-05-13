@@ -13,9 +13,9 @@
         <% } %>
     </ol>
 
-    <form ng-submit="vm.delete()">
+    <form ng-submit="${controllerName ? controllerName + '.' : ''}delete()">
         <fieldset class="buttons">
-            <a class="edit" ui-sref="${propertyName}.edit({id: vm.${propertyName}.id})">Edit</a>
+            <a class="edit" ui-sref="${propertyName}.edit({id: ${controllerName ? controllerName + '.' : ''}${propertyName}.id})">Edit</a>
             <input class="delete" type="submit" value="Delete" onclick="return confirm('Are you sure?');" />
         </fieldset>
     </form>

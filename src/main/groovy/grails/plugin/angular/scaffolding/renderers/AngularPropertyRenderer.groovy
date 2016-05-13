@@ -9,15 +9,17 @@ interface AngularPropertyRenderer {
 
     ElementType getElementType(BeanPropertyAccessor property)
 
-    String renderEmbedded(def bean, BeanPropertyAccessor property)
+    String renderEditEmbedded(def bean, BeanPropertyAccessor property)
 
     String renderEdit(BeanPropertyAccessor property)
+
+    String renderDisplay(def bean, BeanPropertyAccessor property)
 
     String getWidget(BeanPropertyAccessor property)
 
     String getDisplayWidget(BeanPropertyAccessor property)
 
-    String renderDisplay(BeanPropertyAccessor property)
+    String getDisplayWidget(BeanPropertyAccessor property, String controllerName)
 
     CharSequence getLabelText(BeanPropertyAccessor property)
 

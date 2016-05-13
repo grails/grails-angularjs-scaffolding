@@ -1,30 +1,33 @@
 package grails.plugin.angular.scaffolding.renderers
 
 import grails.codegen.model.Model
+import groovy.json.JsonException
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 
+import javax.persistence.Index
 import java.util.regex.Matcher
 
 @Slf4j
 class AngularModuleEditorImpl implements AngularModuleEditor {
 
     boolean addDependency(File module, String dependency) {
+        String jsonString
         try {
             StringBuilder sb = new StringBuilder()
-            String moduleText = module.text
+            final String moduleText = module.text
 
             Matcher group = (moduleText =~ /(angular\.module)(.*),(\s*)(\[)/)
-            String moduleDefinition = group[0][0]
+            final String moduleDefinition = group[0][0]
             int startingIndex = moduleText.indexOf(moduleDefinition) + moduleDefinition.size() - 1
             sb.append(moduleText.substring(0, startingIndex))
 
             String temp = moduleText.substring(startingIndex)
             int endingIndex = temp.indexOf(']')+1
             //Remove trailing commas in the array
-            temp = temp.substring(0, endingIndex).replaceAll(/(?m),(\p{C}|\s)*\]$/, "]")
-            def json = new JsonSlurper().parseText(temp)
+            jsonString = temp.substring(0, endingIndex).replaceAll(/(?m),(\p{C}|\s)*\]$/, "]")
+            def json = new JsonSlurper().parseText(jsonString)
             if (!json.contains(dependency)) {
                 json.add(dependency)
                 sb.append(JsonOutput.prettyPrint(JsonOutput.toJson(json)))
@@ -33,8 +36,11 @@ class AngularModuleEditorImpl implements AngularModuleEditor {
                 module.write(sb.toString())
             }
             true
-        } catch (Exception e) {
-            log.error("Could not add $dependency dependency to module $module.name", e)
+        } catch (JsonException e) {
+            log.error("Could not add $dependency dependency to $module.name because $jsonString is not valid JSON", e)
+            false
+        } catch (IndexOutOfBoundsException | IllegalArgumentException e) {
+            log.error("Could not add $dependency dependency to $module.name because the module dependency array could not be found", e)
             false
         }
     }
