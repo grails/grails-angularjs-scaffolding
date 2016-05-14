@@ -7,13 +7,11 @@ import grails.plugin.formfields.BeanPropertyAccessor
 import grails.plugin.formfields.BeanPropertyAccessorFactory
 import grails.plugin.formfields.FormFieldsTemplateService
 import grails.util.GrailsNameUtils
-import groovy.text.GStringTemplateEngine
 import groovy.xml.MarkupBuilder
 import org.grails.buffer.FastStringWriter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.MessageSource
-import org.springframework.context.support.AbstractMessageSource
 
 import javax.annotation.Resource
 import java.sql.Blob
@@ -33,7 +31,7 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
     FormFieldsTemplateService formFieldsTemplateService
 
     @Autowired
-    AngularElementBuilder angularElementBuilder
+    AngularElementBuilderImpl angularElementBuilder
 
     @Value('${grails.plugin.angular.scaffolding.controllerName:vm}')
     String controllerName
