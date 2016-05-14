@@ -32,48 +32,47 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
     @Autowired
     FormFieldsTemplateService formFieldsTemplateService
 
+    @Autowired
+    AngularElementBuilder angularElementBuilder
+
     @Value('${grails.plugin.angular.scaffolding.controllerName:vm}')
     String controllerName
 
     String lineSeparator = System.getProperty("line.separator")
 
     String renderEditEmbedded(def bean, BeanPropertyAccessor property) {
-        def legendText = resolveMessage(property.labelKeys, property.defaultLabel)
-        println property
-        def writer = new FastStringWriter()
+        String legendText = resolveMessage(property.labelKeys, property.defaultLabel)
+        FastStringWriter writer = new FastStringWriter()
         MarkupBuilder markupBuilder = new MarkupBuilder(writer)
         markupBuilder.doubleQuotes = true
         markupBuilder.fieldset(class: "embedded ${formFieldsTemplateService.toPropertyNameFormat(property.propertyType)}") {
             legend(legendText)
             domainModelService.getEditableProperties(property.persistentProperty.component).each { GrailsDomainClassProperty embedded ->
-                mkp.yieldUnescaped(lineSeparator)
-                mkp.yieldUnescaped renderEdit(beanPropertyAccessorFactory.accessorFor(bean, "${property.pathFromRoot}.${embedded.name}"))
+                Closure renderProperty = angularElementBuilder.renderElement(beanPropertyAccessorFactory.accessorFor(bean, "${property.pathFromRoot}.${embedded.name}"))
+                renderProperty.delegate = markupBuilder
+                renderProperty.call()
             }
-
         }
         writer.toString()
     }
 
     String renderEdit(BeanPropertyAccessor property) {
-        def classes = ['fieldcontain']
-        if (property.required) classes << 'required'
-
-        def writer = new FastStringWriter()
+        List classes = ['fieldcontain']
+        if (property.required) {
+            classes << 'required'
+        }
+        FastStringWriter writer = new FastStringWriter()
         MarkupBuilder markupBuilder = new MarkupBuilder(writer)
         markupBuilder.doubleQuotes = true
+        Closure renderProperty = angularElementBuilder.renderElement(property)
+        renderProperty.delegate = markupBuilder
         markupBuilder.div(class: classes.join(' ')) {
             label(for: property.pathFromRoot, getLabelText(property)) {
                 if (property.required) {
                     span(class: 'required-indicator', '*')
                 }
             }
-            // TODO: encoding information of widget gets lost - don't use MarkupBuilder
-            def widget = getWidget(property)
-            if(widget != null) {
-                mkp.yieldUnescaped(lineSeparator)
-                mkp.yieldUnescaped widget
-            }
-
+            renderProperty.call()
         }
         writer.toString()
 

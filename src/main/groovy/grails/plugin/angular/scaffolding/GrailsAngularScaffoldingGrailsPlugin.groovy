@@ -1,5 +1,6 @@
 package grails.plugin.angular.scaffolding
 
+import grails.plugin.angular.scaffolding.element.AngularElementBuilder
 import grails.plugin.angular.scaffolding.io.FileSystemInteraction
 import grails.plugin.angular.scaffolding.model.DomainModelServiceImpl
 import grails.plugin.angular.scaffolding.renderers.AngularModuleEditorImpl
@@ -50,6 +51,8 @@ Brief summary/description of the plugin.
         angularPropertyRenderer(AngularPropertyRendererImpl)
 
         angularModuleEditor(AngularModuleEditorImpl)
+
+        angularElementBuilder(AngularElementBuilder)
     }}
 
     void doWithDynamicMethods() {
