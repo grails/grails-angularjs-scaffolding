@@ -3,41 +3,40 @@ package grails.plugin.angular.scaffolding.element
 import grails.plugin.formfields.BeanPropertyAccessor
 import grails.util.GrailsNameUtils
 import grails.validation.ConstrainedProperty
-import groovy.json.JsonBuilder
 import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Value
 import java.sql.Blob
 
-class AngularElementBuilderImpl implements AngularElementBuilder {
+class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
 
     @Value('${grails.plugin.angular.scaffolding.controllerName:vm}')
     String controllerName
 
     private static final List<String> DECIMAL_TYPES = ['double', 'float', 'bigdecimal']
 
-    ElementType getElementType(BeanPropertyAccessor property) {
+    PropertyType getPropertyType(BeanPropertyAccessor property) {
         if (property.propertyType in [String, null]) {
-            ElementType.STRING
+            PropertyType.STRING
         } else if (property.propertyType in [boolean, Boolean]) {
-            ElementType.BOOLEAN
+            PropertyType.BOOLEAN
         } else if (property.propertyType.isPrimitive() || property.propertyType in Number) {
-            ElementType.NUMBER
+            PropertyType.NUMBER
         } else if (property.propertyType in URL) {
-            ElementType.URL
+            PropertyType.URL
         } else if (property.propertyType.isEnum()) {
-            ElementType.ENUM
+            PropertyType.ENUM
         } else if (property.persistentProperty?.oneToOne || property.persistentProperty?.manyToOne || property.persistentProperty?.manyToMany) {
-            ElementType.ASSOCIATION
+            PropertyType.ASSOCIATION
         } else if (property.persistentProperty?.oneToMany) {
-            ElementType.ONETOMANY
+            PropertyType.ONETOMANY
         } else if (property.propertyType in [Date, Calendar, java.sql.Date]) {
-            ElementType.DATE
+            PropertyType.DATE
         } else if (property.propertyType in java.sql.Time) {
-            ElementType.TIME
+            PropertyType.TIME
         } else if (property.propertyType in [byte[], Byte[], Blob]) {
-            ElementType.FILE
+            PropertyType.FILE
         } else if (property.propertyType in [TimeZone, Currency, Locale]) {
-            ElementType.SPECIAL
+            PropertyType.SPECIAL
         }
     }
 
@@ -57,39 +56,53 @@ class AngularElementBuilderImpl implements AngularElementBuilder {
         attributes
     }
 
-    Closure renderElement(BeanPropertyAccessor property) {
-        ElementType elementType = getElementType(property)
+    String renderPropertyDisplay(BeanPropertyAccessor property, Boolean includeControllerName) {
+        StringBuilder sb = new StringBuilder()
+        if (includeControllerName) {
+            sb.append(controllerName).append('.')
+        }
+        sb.append(GrailsNameUtils.getPropertyName(property.rootBeanType)).append('.')
+        sb.append(property.pathFromRoot)
+        if (getPropertyType(property) == PropertyType.ENUM) {
+            sb.append(".name")
+        }
+        "{{${sb.toString()}}}"
+    }
+
+    Closure renderProperty(BeanPropertyAccessor property) {
+        PropertyType elementType = getPropertyType(property)
         switch(elementType) {
-            case ElementType.STRING:
+            case PropertyType.STRING:
                 renderString(property)
                 break
-            case ElementType.BOOLEAN:
+            case PropertyType.BOOLEAN:
                 renderBoolean(property)
                 break
-            case ElementType.NUMBER:
+            case PropertyType.NUMBER:
                 renderNumber(property)
                 break
-            case ElementType.URL:
+            case PropertyType.URL:
                 renderURL(property)
                 break
-            case ElementType.ENUM:
+            case PropertyType.ENUM:
                 renderSelect(property)
                 break
-            case ElementType.ASSOCIATION:
+            case PropertyType.ASSOCIATION:
                 // TODO case association
-            case ElementType.ONETOMANY:
+            case PropertyType.ONETOMANY:
                 // TODO case oneToMany
                 { -> }
                 break
-            case ElementType.DATE:
+            case PropertyType.DATE:
                 renderDate(property)
                 break
-            case ElementType.TIME:
+            case PropertyType.TIME:
                 renderTime(property)
                 break
-            case ElementType.FILE:
-                // TODO case file
-            case ElementType.SPECIAL:
+            case PropertyType.FILE:
+                renderFile(property)
+                break
+            case PropertyType.SPECIAL:
                 // TODO case timezone,currency,locale
                 { -> }
                 break
@@ -223,6 +236,15 @@ class AngularElementBuilderImpl implements AngularElementBuilder {
 
     Closure renderTime(BeanPropertyAccessor property) {
         renderSimpleInput(property, "datetime-local")
+    }
+
+    Closure renderFile(BeanPropertyAccessor property) {
+        Map attributes = getStandardAttributes(property)
+        attributes.type = "file"
+        attributes['file-model'] = attributes.remove('ng-model')
+        return { ->
+            input(attributes)
+        }
     }
 
     private Closure renderSimpleInput(BeanPropertyAccessor property, String type) {

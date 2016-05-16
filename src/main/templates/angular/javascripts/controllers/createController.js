@@ -15,10 +15,10 @@ function ${className}CreateController(${className}, \$state) {
             \$state.go('${propertyName}.list');
         }, function(response) {
             var data = response.data;
-            if (!angular.isArray(data)) {
+            if (data.hasOwnProperty('message')) {
                 ${controllerAs}.errors = [data];
             } else {
-                ${controllerAs}.errors = data;
+                ${controllerAs}.errors = data._embedded.errors;
             }
         });
     };

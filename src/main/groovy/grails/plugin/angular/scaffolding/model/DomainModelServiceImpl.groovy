@@ -38,6 +38,4 @@ class DomainModelServiceImpl implements DomainModelService {
     static void sort(List<GrailsDomainClassProperty> properties, GrailsDomainClass domainClass) {
         Collections.sort(properties, new DomainClassPropertyComparator(domainClass))
     }
-
-
 }

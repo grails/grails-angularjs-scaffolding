@@ -5,15 +5,17 @@ import grails.plugin.formfields.BeanPropertyAccessor
 /**
  * Created by Jim on 5/14/2016.
  */
-interface AngularElementBuilder {
+interface AngularMarkupBuilder {
 
     String getControllerName()
 
-    ElementType getElementType(BeanPropertyAccessor property)
+    PropertyType getPropertyType(BeanPropertyAccessor property)
 
     Map getStandardAttributes(BeanPropertyAccessor property)
 
-    Closure renderElement(BeanPropertyAccessor property)
+    String renderPropertyDisplay(BeanPropertyAccessor property, Boolean includeControllerName)
+
+    Closure renderProperty(BeanPropertyAccessor property)
 
     Closure renderString(BeanPropertyAccessor property)
 

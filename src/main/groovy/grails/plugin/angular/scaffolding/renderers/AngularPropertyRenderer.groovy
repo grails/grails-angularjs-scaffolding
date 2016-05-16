@@ -1,24 +1,16 @@
 package grails.plugin.angular.scaffolding.renderers
 
-import grails.plugin.angular.scaffolding.element.ElementType
+import grails.core.GrailsDomainClass
 import grails.plugin.formfields.BeanPropertyAccessor
 import groovy.xml.MarkupBuilder
 
 interface AngularPropertyRenderer {
 
-    String getControllerName()
-
     String renderEditEmbedded(def bean, BeanPropertyAccessor property)
 
     String renderEdit(BeanPropertyAccessor property)
 
-    void renderEdit(BeanPropertyAccessor property, MarkupBuilder markupBuilder)
-
-    String renderDisplay(def bean, BeanPropertyAccessor property)
-
-    String getDisplayWidget(BeanPropertyAccessor property)
-
-    String getDisplayWidget(BeanPropertyAccessor property, String controllerName)
+    String renderDisplay(def bean, GrailsDomainClass domainClass)
 
     String getLabelText(BeanPropertyAccessor property)
 

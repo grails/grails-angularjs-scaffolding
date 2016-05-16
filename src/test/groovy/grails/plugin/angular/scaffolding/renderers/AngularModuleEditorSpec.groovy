@@ -53,7 +53,7 @@ class AngularModuleEditorSpec extends Specification implements ModelBuilder {
         when:
         boolean success = editor.addDependency(file, "hello")
 
-        then:
+        then: "fails because it isn't valid json"
         file.text == """
             var foo = "bar";
             angular.module('x',[foo]);

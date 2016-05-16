@@ -8,7 +8,8 @@ function ${className}(\$resource) {
     var ${className} = \$resource(
         "${propertyName}/:id",
         {"id": "@id"},
-        {"update": {method: "PUT"}, "list": {method: "GET", isArray: true}}
+        {"update": {method: "PUT"},
+         "list": {method: "GET", isArray: true}}
     );
     return ${className};
 }

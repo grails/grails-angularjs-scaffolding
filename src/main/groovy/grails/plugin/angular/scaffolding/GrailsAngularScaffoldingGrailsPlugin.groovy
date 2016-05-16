@@ -1,6 +1,7 @@
 package grails.plugin.angular.scaffolding
 
-import grails.plugin.angular.scaffolding.element.AngularElementBuilderImpl
+import grails.plugin.angular.scaffolding.element.AngularMarkupBuilderImpl
+import grails.plugin.angular.scaffolding.model.CacheableBeanPropertyAccessorFactory
 import grails.plugin.angular.scaffolding.model.DomainModelServiceImpl
 import grails.plugin.angular.scaffolding.renderers.AngularModuleEditorImpl
 import grails.plugin.angular.scaffolding.renderers.AngularPropertyRendererImpl
@@ -50,7 +51,9 @@ Brief summary/description of the plugin.
 
         angularModuleEditor(AngularModuleEditorImpl)
 
-        angularElementBuilder(AngularElementBuilderImpl)
+        angularElementBuilder(AngularMarkupBuilderImpl)
+
+        beanPropertyAccessorFactory(CacheableBeanPropertyAccessorFactory)
     }}
 
     void doWithDynamicMethods() {

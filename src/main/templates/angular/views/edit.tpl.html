@@ -4,13 +4,13 @@
         <li><a ui-sref="${propertyName}.list" class="list">${className} List</a></li>
     </ul>
 </div>
-<div id="create-${propertyName}" class="content scaffold-create" role="main">
+<div id="edit-${propertyName}" class="content scaffold-edit" role="main">
     <h1>Edit ${className}</h1>
     <ul class="errors" role="alert" ng-if="${controllerName ? controllerName + '.' : ''}errors">
         <li ng-repeat="error in ${controllerName ? controllerName + '.' : ''}errors">{{error.message}}</li>
     </ul>
 
-    <form name="save${className}">
+    <form name="update${className}" ng-submit="${controllerName ? controllerName + '.' : ''}update${className}()">
         <fieldset class="form">
             <ng-include src="${modulePath}/form.html"></ng-include>
         </fieldset>
