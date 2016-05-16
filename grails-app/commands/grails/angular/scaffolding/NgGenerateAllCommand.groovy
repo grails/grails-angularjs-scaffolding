@@ -27,6 +27,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand, ModelBuilder {
 
     @Override
     boolean handle() {
+        try {
         domainClass = grailsDomainClassMappingContext.getPersistentEntity(args[0])
         grailsDomainClass = ((GrailsDomainClassValidator)grailsDomainClassMappingContext.getEntityValidator(domainClass)).domainClass
         Object bean = domainClass.newInstance()
@@ -134,7 +135,9 @@ class NgGenerateAllCommand implements GrailsApplicationCommand, ModelBuilder {
                 destination: file("${basePath}/${modulePath}/domain/${model.className}.js"),
                 model: artefactParams,
                 overwrite: true
-
+        } catch (e) {
+            println e.stackTrace
+        }
         return true
     }
 }

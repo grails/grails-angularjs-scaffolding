@@ -4,6 +4,7 @@ import grails.plugin.formfields.BeanPropertyAccessor
 import grails.util.GrailsNameUtils
 import grails.validation.ConstrainedProperty
 import groovy.json.JsonBuilder
+import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Value
 import java.sql.Blob
 
@@ -78,6 +79,7 @@ class AngularElementBuilderImpl implements AngularElementBuilder {
                 // TODO case association
             case ElementType.ONETOMANY:
                 // TODO case oneToMany
+                { -> }
                 break
             case ElementType.DATE:
                 renderDate(property)
@@ -89,6 +91,7 @@ class AngularElementBuilderImpl implements AngularElementBuilder {
                 // TODO case file
             case ElementType.SPECIAL:
                 // TODO case timezone,currency,locale
+                { -> }
                 break
         }
     }
@@ -190,15 +193,17 @@ class AngularElementBuilderImpl implements AngularElementBuilder {
         final String name = attributes.name
 
         if (inList) {
-            attributes['ng-options'] = "$name for $name in ${new JsonBuilder(inList).toString()}"
+            attributes['ng-options'] = "$name for $name in ${JsonOutput.toJson(inList)}"
         } else if (enumList) {
-            attributes['ng-options'] = "${name}.id as ${name}.name for ${name} in ${new JsonBuilder(enumList).toString()}"
+            attributes['ng-options'] = "${name}.id as ${name}.name for ${name} in ${JsonOutput.toJson(enumList)}"
         } else {
             attributes['ng-options'] = "$name for $name in ${name}s"
         }
 
         { ->
-            select(attributes)
+            setDoubleQuotes(false)
+            select('', attributes)
+            setDoubleQuotes(true)
         }
     }
 

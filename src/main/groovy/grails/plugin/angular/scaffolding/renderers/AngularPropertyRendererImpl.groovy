@@ -38,30 +38,39 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
 
     String lineSeparator = System.getProperty("line.separator")
 
-    String renderEditEmbedded(def bean, BeanPropertyAccessor property) {
-        String legendText = resolveMessage(property.labelKeys, property.defaultLabel)
+    String outputMarkupContent(Closure closure) {
         FastStringWriter writer = new FastStringWriter()
         MarkupBuilder markupBuilder = new MarkupBuilder(writer)
         markupBuilder.doubleQuotes = true
-        markupBuilder.fieldset(class: "embedded ${formFieldsTemplateService.toPropertyNameFormat(property.propertyType)}") {
-            legend(legendText)
-            domainModelService.getEditableProperties(property.persistentProperty.component).each { GrailsDomainClassProperty embedded ->
-                Closure renderProperty = angularElementBuilder.renderElement(beanPropertyAccessorFactory.accessorFor(bean, "${property.pathFromRoot}.${embedded.name}"))
-                renderProperty.delegate = markupBuilder
-                renderProperty.call()
-            }
-        }
+        markupBuilder.escapeAttributes = false
+        closure.delegate = markupBuilder
+        closure.call()
         writer.toString()
     }
 
+    String renderEditEmbedded(def bean, BeanPropertyAccessor property) {
+        String legendText = resolveMessage(property.labelKeys, property.defaultLabel)
+        outputMarkupContent {
+            fieldset(class: "embedded ${formFieldsTemplateService.toPropertyNameFormat(property.propertyType)}") {
+                legend(legendText)
+                domainModelService.getEditableProperties(property.persistentProperty.component).each { GrailsDomainClassProperty embedded ->
+                    renderEdit(beanPropertyAccessorFactory.accessorFor(bean, "${property.pathFromRoot}.${embedded.name}"), delegate)
+                }
+            }
+        }
+    }
+
     String renderEdit(BeanPropertyAccessor property) {
+        outputMarkupContent {
+            renderEdit(property, delegate)
+        }
+    }
+
+    void renderEdit(BeanPropertyAccessor property, MarkupBuilder markupBuilder) {
         List classes = ['fieldcontain']
         if (property.required) {
             classes << 'required'
         }
-        FastStringWriter writer = new FastStringWriter()
-        MarkupBuilder markupBuilder = new MarkupBuilder(writer)
-        markupBuilder.doubleQuotes = true
         Closure renderProperty = angularElementBuilder.renderElement(property)
         renderProperty.delegate = markupBuilder
         markupBuilder.div(class: classes.join(' ')) {
@@ -72,76 +81,6 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
             }
             renderProperty.call()
         }
-        writer.toString()
-
-    }
-
-    ElementType getElementType(BeanPropertyAccessor property) {
-        if (property.propertyType in [String, null]) {
-            ElementType.STRING
-        } else if (property.propertyType in [boolean, Boolean]) {
-            ElementType.BOOLEAN
-        } else if (property.propertyType.isPrimitive() || property.propertyType in Number) {
-            ElementType.NUMBER
-        } else if (property.propertyType in URL) {
-            ElementType.URL
-        } else if (property.propertyType.isEnum()) {
-            ElementType.ENUM
-        } else if (property.persistentProperty?.oneToOne || property.persistentProperty?.manyToOne || property.persistentProperty?.manyToMany) {
-            ElementType.ASSOCIATION
-        } else if (property.persistentProperty?.oneToMany) {
-            ElementType.ONETOMANY
-        } else if (property.propertyType in [Date, Calendar, java.sql.Date]) {
-            ElementType.DATE
-        } else if (property.propertyType in java.sql.Time) {
-            ElementType.TIME
-        } else if (property.propertyType in [byte[], Byte[], Blob]) {
-            ElementType.FILE
-        } else if (property.propertyType in [TimeZone, Currency, Locale]) {
-            ElementType.SPECIAL
-        }
-    }
-
-    String getWidget(BeanPropertyAccessor property) {
-        Element element
-
-        ElementType elementType = getElementType(property)
-
-        switch(elementType) {
-            case ElementType.STRING:
-                element = new StringInput(property)
-                break
-            case ElementType.BOOLEAN:
-                element = new BooleanInput(property)
-                break
-            case ElementType.NUMBER:
-                element = new NumberInput(property)
-                break
-            case ElementType.URL:
-                element = new Input(property, "url")
-                break
-            case ElementType.ENUM:
-                element = new Select(property)
-                break
-            case ElementType.ASSOCIATION:
-                // TODO case association
-            case ElementType.ONETOMANY:
-                // TODO case oneToMany
-                break
-            case ElementType.DATE:
-                element = new Input(property, "date")
-                break
-            case ElementType.TIME:
-                element = new Input(property, "datetime-local")
-                break
-            case ElementType.FILE:
-                // TODO case file
-            case ElementType.SPECIAL:
-                // TODO case timezone,currency,locale
-                break
-        }
-
-        element?.render() ?: ""
     }
 
     String getDisplayWidget(BeanPropertyAccessor property, String controllerName) {
@@ -154,36 +93,30 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
     }
 
     String renderDisplay(def bean, BeanPropertyAccessor property) {
-        def writer = new FastStringWriter()
-        MarkupBuilder markupBuilder = new MarkupBuilder(writer)
-        markupBuilder.doubleQuotes = true
-        markupBuilder.li(class: 'fieldcontain') {
-            span([id: "${property.pathFromRoot}-label", class: "property-label"], getLabelText(property))
-            div([class: "property-value", "aria-labelledby": "${property.pathFromRoot}-label"]) {
+        outputMarkupContent {
+            li(class: 'fieldcontain') {
+                span([id: "${property.pathFromRoot}-label", class: "property-label"], getLabelText(property))
+                div([class: "property-value", "aria-labelledby": "${property.pathFromRoot}-label"]) {
 
-                def persistentProperty = property.persistentProperty
-                if (persistentProperty?.association) {
-                    if (persistentProperty.embedded) {
-                        domainModelService.getVisibleProperties(property.persistentProperty.component).each { GrailsDomainClassProperty embedded ->
-                            mkp.yieldUnescaped(lineSeparator)
-                            mkp.yieldUnescaped renderDisplay(bean, beanPropertyAccessorFactory.accessorFor(bean, "${property.pathFromRoot}.${embedded.name}"))
+                    def persistentProperty = property.persistentProperty
+                    if (persistentProperty?.association) {
+                        if (persistentProperty.embedded) {
+                            domainModelService.getVisibleProperties(property.persistentProperty.component).each { GrailsDomainClassProperty embedded ->
+                                mkp.yieldUnescaped(lineSeparator)
+                                mkp.yieldUnescaped renderDisplay(bean, beanPropertyAccessorFactory.accessorFor(bean, "${property.pathFromRoot}.${embedded.name}"))
+                            }
                         }
-                    }
-                    /* else if (persistentProperty.oneToMany || persistentProperty.manyToMany) {
-                        return displayAssociationList(model.value, persistentProperty.referencedDomainClass)
+                        /* else if (persistentProperty.oneToMany || persistentProperty.manyToMany) {
+                            return displayAssociationList(model.value, persistentProperty.referencedDomainClass)
+                        } else {
+                            return displayAssociation(model.value, persistentProperty.referencedDomainClass)
+                        }*/
                     } else {
-                        return displayAssociation(model.value, persistentProperty.referencedDomainClass)
-                    }*/
-                } else {
-                    span(getDisplayWidget(property))
+                        span(getDisplayWidget(property))
+                    }
                 }
-
-
-
             }
         }
-
-        writer.toString()
     }
 
     String getLabelText(BeanPropertyAccessor property) {
