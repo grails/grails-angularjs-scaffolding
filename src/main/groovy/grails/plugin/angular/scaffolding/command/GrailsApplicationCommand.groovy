@@ -6,11 +6,12 @@ import grails.dev.commands.ApplicationCommand
 import grails.dev.commands.ExecutionContext
 import grails.plugin.angular.scaffolding.io.FileSystemInteraction
 import grails.plugin.angular.scaffolding.io.FileSystemInteractionImpl
+import grails.plugin.angular.scaffolding.model.AngularModelBuilder
 import grails.plugin.angular.scaffolding.templates.TemplateRenderer
 import grails.plugin.angular.scaffolding.templates.TemplateRendererImpl
 
 
-trait GrailsApplicationCommand implements ApplicationCommand {
+trait GrailsApplicationCommand implements ApplicationCommand, AngularModelBuilder {
 
     @Delegate TemplateRenderer templateRenderer
     @Delegate ConsoleLogger consoleLogger

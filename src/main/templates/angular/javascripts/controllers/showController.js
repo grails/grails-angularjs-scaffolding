@@ -18,7 +18,7 @@ function ${className}ShowController(${className}, \$stateParams, \$state) {
             \$state.go('${propertyName}.list');
         }, function() {
             //on error
-        })
+        });
     };
 
 }

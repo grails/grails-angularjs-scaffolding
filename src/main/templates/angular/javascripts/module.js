@@ -1,5 +1,5 @@
 //= wrapped
-//= require /angular/angular ${dependencies.collect{ '\n//= require ' + it.value }.join('\n') }
+//= require /angular/angular ${'\n' + dependencies.collect{ '//= require ' + it.value }.join('\n') }
 //= require_self
 //= require_tree services
 //= require_tree controllers
@@ -7,8 +7,7 @@
 //= require_tree domain
 //= require_tree templates
 
-angular.module("${fullName}", [${dependencies.collect{it.key}.join(', ')}])
-    .config(config);
+angular.module("${moduleName}", [${dependencies.keySet().join(', ')}]).config(config);
 
 function config(\$stateProvider) {
     \$stateProvider

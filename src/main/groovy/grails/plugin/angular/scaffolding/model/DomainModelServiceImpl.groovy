@@ -11,6 +11,12 @@ import java.sql.Blob
 
 class DomainModelServiceImpl implements DomainModelService {
 
+    List<String> currencyCodes = ['EUR', 'XCD', 'USD', 'XOF', 'NOK', 'AUD',
+                                  'XAF', 'NZD', 'MAD', 'DKK', 'GBP', 'CHF',
+                                  'XPF', 'ILS', 'ROL', 'TRL']
+
+    List<String> decimalTypes = ['double', 'float', 'bigdecimal']
+
     List<GrailsDomainClassProperty> getEditableProperties(GrailsDomainClass domainClass) {
         List<GrailsDomainClassProperty> properties = domainClass.persistentProperties as List
         List blacklist = ['dateCreated', 'lastUpdated']
@@ -29,6 +35,11 @@ class DomainModelServiceImpl implements DomainModelService {
     List<GrailsDomainClassProperty> getVisibleProperties(GrailsDomainClass domainClass) {
         List<GrailsDomainClassProperty> properties = domainClass.persistentProperties
         sort(properties, domainClass)
+        properties
+    }
+
+    List<GrailsDomainClassProperty> getShortListVisibleProperties(GrailsDomainClass domainClass) {
+        List<GrailsDomainClassProperty> properties = getVisibleProperties(domainClass)
         if (properties.size() > 6) {
             properties = properties[0..6]
         }
@@ -71,8 +82,16 @@ class DomainModelServiceImpl implements DomainModelService {
         clazz in [byte[], Byte[], Blob]
     }
 
-    protected Boolean isSpecial(Class clazz) {
-        clazz in [TimeZone, Currency, Locale]
+    protected Boolean isTimeZone(Class clazz) {
+        clazz in TimeZone
+    }
+
+    protected Boolean isCurrency(Class clazz) {
+        clazz in Currency
+    }
+
+    protected Boolean isLocale(Class clazz) {
+        clazz in Locale
     }
 
     PropertyType getPropertyType(BeanPropertyAccessor property) {
@@ -96,8 +115,12 @@ class DomainModelServiceImpl implements DomainModelService {
             PropertyType.TIME
         } else if (isFile(property.propertyType)) {
             PropertyType.FILE
-        } else if (isSpecial(property.propertyType)) {
-            PropertyType.SPECIAL
+        } else if (isTimeZone(property.propertyType)) {
+            PropertyType.TIMEZONE
+        } else if (isCurrency(property.propertyType)) {
+            PropertyType.CURRENCY
+        } else if (isLocale(property.propertyType)) {
+            PropertyType.LOCALE
         }
     }
 
@@ -122,8 +145,12 @@ class DomainModelServiceImpl implements DomainModelService {
             PropertyType.TIME
         } else if (isFile(property.type)) {
             PropertyType.FILE
-        } else if (isSpecial(property.type)) {
-            PropertyType.SPECIAL
+        } else if (isTimeZone(property.type)) {
+            PropertyType.TIMEZONE
+        } else if (isCurrency(property.type)) {
+            PropertyType.CURRENCY
+        } else if (isLocale(property.type)) {
+            PropertyType.LOCALE
         }
     }
     
@@ -136,16 +163,10 @@ class DomainModelServiceImpl implements DomainModelService {
             }
         }
     }
-    
-    Boolean hasFileProperty(GrailsDomainClass domainClass) {
+
+    Boolean hasPropertyType(GrailsDomainClass domainClass, PropertyType propertyType) {
         hasProperty(domainClass) { GrailsDomainClassProperty property ->
-            isFile(property.type)
-        }
-    }
-    
-    Boolean hasTimeZoneProperty(GrailsDomainClass domainClass) {
-        hasProperty(domainClass) { GrailsDomainClassProperty property ->
-            property.type in TimeZone
+            getPropertyType(property) == propertyType
         }
     }
 
@@ -160,10 +181,25 @@ class DomainModelServiceImpl implements DomainModelService {
 
         "${shortName}, ${longName} ${hour}:${min} [${timeZone.ID}]"
     }
+    
+    protected String formatLocale(Locale locale) {
+        locale.country ? "${locale.language}, ${locale.country},  ${locale.displayName}" : "${locale.language}, ${locale.displayName}"
+    }
 
     Map<String, String> getTimeZones() {
         TimeZone.availableIDs.collectEntries {
             [(it): formatTimeZone(TimeZone.getTimeZone(it))]
+        }
+    }
+    
+    Map<String, String> getLocales() {
+        Locale.availableLocales.collectEntries {
+            if (it.country || it.language) {
+                String key = it.country ? "${it.language}_${it.country}" : it.language
+                [(key): formatLocale(it)]
+            } else {
+                [:]
+            }
         }
     }
 }

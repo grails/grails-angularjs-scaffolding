@@ -14,16 +14,22 @@ interface DomainModelService {
 
     List<GrailsDomainClassProperty> getVisibleProperties(GrailsDomainClass domainClass)
 
+    List<GrailsDomainClassProperty> getShortListVisibleProperties(GrailsDomainClass domainClass)
+
     void sort(List<GrailsDomainClassProperty> properties, GrailsDomainClass domainClass)
 
     PropertyType getPropertyType(BeanPropertyAccessor property)
 
     PropertyType getPropertyType(GrailsDomainClassProperty property)
 
-    Boolean hasFileProperty(GrailsDomainClass domainClass)
-
-    Boolean hasTimeZoneProperty(GrailsDomainClass domainClass)
+    Boolean hasPropertyType(GrailsDomainClass domainClass, PropertyType propertyType)
 
     Map<String, String> getTimeZones()
+
+    Map<String, String> getLocales()
+
+    List<String> getCurrencyCodes()
+
+    List<String> getDecimalTypes()
 
 }

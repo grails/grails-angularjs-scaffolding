@@ -4,12 +4,10 @@ angular
     .module("${moduleName}")
     .controller("${className}CreateController", ${className}CreateController);
 
-function ${className}CreateController(${className}, \$state<%= if (injectTimeZone) { ', timeZoneService' } %>) {
+function ${className}CreateController(${className}, \$state<%= injections ? ', ' + injections.keySet().join(', ') : '' %>) {
 
     var ${controllerAs} = this;
-
-    <%= if (injectTimeZone) { controllerAs+'.timeZoneList = timeZoneService.get();' } %>
-
+    <%= injections ? injections.values().join('\n') : '' %>
     ${controllerAs}.${propertyName} = new ${className}();
 
     ${controllerAs}.save${className} = function() {

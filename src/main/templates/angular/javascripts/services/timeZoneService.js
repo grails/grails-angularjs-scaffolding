@@ -2,7 +2,7 @@
 
 angular
     .module("${moduleName}")
-    .factory("timeZoneService", timeZoneService);
+    .service("timeZoneService", timeZoneService);
 
 function timeZoneService() {
     this.get = function () {

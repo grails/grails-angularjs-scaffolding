@@ -1,6 +1,5 @@
 package grails.plugin.angular.scaffolding.element
 
-import grails.core.GrailsDomainClassProperty
 import grails.plugin.angular.scaffolding.model.DomainModelService
 import grails.plugin.formfields.BeanPropertyAccessor
 import grails.util.GrailsNameUtils
@@ -8,7 +7,6 @@ import grails.validation.ConstrainedProperty
 import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import java.sql.Blob
 
 class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
 
@@ -17,8 +15,6 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
 
     @Value('${grails.plugin.angular.scaffolding.controllerName:vm}')
     String controllerName
-
-    private static final List<String> DECIMAL_TYPES = ['double', 'float', 'bigdecimal']
 
     Map getStandardAttributes(BeanPropertyAccessor property) {
         final String objectName = GrailsNameUtils.getPropertyName(property.rootBeanType)
@@ -65,7 +61,8 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
                 renderSelect(property)
                 break
             case PropertyType.ASSOCIATION:
-                // TODO case association
+                renderAssociation(property)
+                break
             case PropertyType.ONETOMANY:
                 // TODO case oneToMany
                 { -> }
@@ -79,13 +76,14 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
             case PropertyType.FILE:
                 renderFile(property)
                 break
-            case PropertyType.SPECIAL:
-                if (property.propertyType == TimeZone) {
-                    renderTimeZone(property)
-                } else {
-                    // TODO case currency,locale
-                    { -> }
-                }
+            case PropertyType.TIMEZONE:
+                renderTimeZone(property)
+                break
+            case PropertyType.CURRENCY:
+                renderCurrency(property)
+                break
+            case PropertyType.LOCALE:
+                renderLocale(property)
                 break
             default:
                 { -> }
@@ -124,7 +122,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
             attributes.maxlength = property.constraints.maxSize
         }
 
-        { ->
+        return { ->
             input(attributes)
         }
     }
@@ -146,10 +144,10 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
             } else {
                 String typeName = property.propertyType.simpleName.toLowerCase()
 
-                if(typeName in DECIMAL_TYPES) {
-                    attributes.type = "number decimal"
-                } else {
-                    attributes.type = "number"
+                attributes.type = "number"
+
+                if(typeName in domainModelService.decimalTypes) {
+                    attributes.step = "any"
                 }
                 if (property.constraints?.scale != null) {
                     attributes.step = "0.${'0' * (property.constraints.scale - 1)}1"
@@ -163,7 +161,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
             }
         }
 
-        { ->
+        return { ->
             input(attributes)
         }
     }
@@ -196,10 +194,24 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
             attributes['ng-options'] = "$name for $name in ${controllerName}.${name}List"
         }
 
-        { ->
+        return { ->
             setDoubleQuotes(false)
             select('', attributes)
             setDoubleQuotes(true)
+        }
+    }
+
+    Closure renderAssociation(BeanPropertyAccessor property) {
+        Map attributes = getStandardAttributes(property)
+        final String name = attributes.name
+        attributes['ng-options'] = "${name}.id as $name for $name in ${controllerName}.${name}List"
+
+        if (property.persistentProperty.manyToMany) {
+            attributes["multiple"] = ""
+        }
+
+        return { ->
+            select('', attributes)
         }
     }
 
@@ -208,7 +220,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         if (property.constraints?.maxSize) {
             attributes.maxlength = property.constraints.maxSize
         }
-        { ->
+        return { ->
             textarea(attributes)
         }
     }
@@ -236,7 +248,36 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
 
         attributes['ng-init'] = "${attributes["ng-model"]} = '$selected'"
         final String name = attributes.name
-        attributes['ng-options'] = "$name for $name in $controllerName.${name}List"
+        attributes['ng-options'] = "key as value for (key , value) in ${controllerName}.timeZoneList"
+
+        return { ->
+            select('', attributes)
+        }
+    }
+
+    Closure renderCurrency(BeanPropertyAccessor property) {
+        Map attributes = getStandardAttributes(property)
+
+        Currency currency = Currency.getInstance(Locale.default)
+        String selected = currency.currencyCode
+
+        attributes['ng-init'] = "${attributes["ng-model"]} = '$selected'"
+        final String name = attributes.name
+        attributes['ng-options'] = "$name for $name in ${controllerName}.currencyList"
+
+        return { ->
+            select('', attributes)
+        }
+    }
+
+    Closure renderLocale(BeanPropertyAccessor property) {
+        Map attributes = getStandardAttributes(property)
+
+        Locale locale = Locale.default
+        String selected = locale.country ? "${locale.language}_${locale.country}" : locale.language
+
+        attributes['ng-init'] = "${attributes["ng-model"]} = '$selected'"
+        attributes['ng-options'] = "key as value for (key , value) in ${controllerName}.localeList"
 
         return { ->
             select('', attributes)

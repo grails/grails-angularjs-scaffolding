@@ -14,5 +14,7 @@ enum PropertyType {
     ASSOCIATION,
     ONETOMANY,
     FILE,
-    SPECIAL
+    TIMEZONE,
+    CURRENCY,
+    LOCALE
 }

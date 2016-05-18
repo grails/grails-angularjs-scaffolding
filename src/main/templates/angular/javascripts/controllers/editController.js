@@ -4,10 +4,10 @@ angular
     .module("${moduleName}")
     .controller("${className}EditController", ${className}EditController);
 
-function ${className}EditController(${className}, \$stateParams, \$state<%= if (injectTimeZone) { ', timeZoneService' } %>) {
+function ${className}EditController(${className}, \$stateParams, \$state<%= injections ? ', ' + injections.keySet().join(', ') : '' %>) {
     var ${controllerAs} = this;
 
-    <%= if (injectTimeZone) { controllerAs+'.timeZoneList = timeZoneService.get();' } %>
+    <%= injections ? injections.values().join('\n    ') : '' %>
 
     ${className}.get({id: \$stateParams.id}, function(data) {
         ${controllerAs}.${propertyName} = new ${className}(data);
