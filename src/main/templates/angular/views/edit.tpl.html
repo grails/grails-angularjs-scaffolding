@@ -12,7 +12,7 @@
 
     <form name="update${className}" ng-submit="${controllerName ? controllerName + '.' : ''}update${className}()">
         <fieldset class="form">
-            <ng-include src="${modulePath}/form.html"></ng-include>
+            <ng-include src="'/${modulePath}/form.html'"></ng-include>
         </fieldset>
         <fieldset class="buttons">
             <input type="submit" class="save" value="Update" />

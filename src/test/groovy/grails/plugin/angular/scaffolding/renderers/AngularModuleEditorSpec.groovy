@@ -43,6 +43,24 @@ class AngularModuleEditorSpec extends Specification implements ModelBuilder {
         success
     }
 
+    void "test addDependency with annotations"() {
+        given:
+        file.write("""
+            angular.module('x',[]).controller("Hello", ["\$scope, function(\$scope) {}]);;
+        """)
+
+        when:
+        boolean success = editor.addDependency(file, "hello")
+
+        then:
+        file.text == """
+            angular.module('x',[
+    "hello"
+]).controller("Hello", ["\$scope, function(\$scope) {}]);;
+        """
+        success
+    }
+
     void "test addDependency with variable in list"() {
         given:
         file.write("""

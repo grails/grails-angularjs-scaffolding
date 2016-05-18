@@ -12,6 +12,7 @@ import grails.plugin.angular.scaffolding.renderers.AngularModuleEditor
 import grails.plugin.angular.scaffolding.renderers.AngularPropertyRenderer
 import grails.plugin.formfields.BeanPropertyAccessor
 import grails.plugin.formfields.BeanPropertyAccessorFactory
+import groovy.json.JsonOutput
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.validation.GrailsDomainClassValidator
@@ -38,12 +39,9 @@ class NgGenerateAllCommand implements GrailsApplicationCommand, ModelBuilder {
 
             List<String> formFields = []
             Map<GrailsDomainClassProperty, String> listProperties = [:]
-            Boolean hasFileProperty = false
+
             for (property in domainModelService.getEditableProperties(grailsDomainClass)) {
-                def propertyAccessor = beanPropertyAccessorFactory.accessorFor(bean, property.name)
-                if (angularMarkupBuilder.getPropertyType(propertyAccessor) == PropertyType.FILE) {
-                    hasFileProperty = true
-                }
+                BeanPropertyAccessor propertyAccessor = beanPropertyAccessorFactory.accessorFor(bean, property.name)
                 if (property?.embedded) {
                     formFields.add(angularPropertyRenderer.renderEditEmbedded(bean, propertyAccessor))
                 } else {
@@ -54,7 +52,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand, ModelBuilder {
             String showForm = angularPropertyRenderer.renderDisplay(bean, grailsDomainClass)
 
             domainModelService.getVisibleProperties(grailsDomainClass).each {
-                def propertyAccessor = beanPropertyAccessorFactory.accessorFor(bean, it.name)
+                BeanPropertyAccessor propertyAccessor = beanPropertyAccessorFactory.accessorFor(bean, it.name)
                 listProperties[it] = angularMarkupBuilder.renderPropertyDisplay(propertyAccessor, false)
             }
 
@@ -73,6 +71,23 @@ class NgGenerateAllCommand implements GrailsApplicationCommand, ModelBuilder {
                 String coreAssetPath = "/${model.packagePath.replaceAll('\\\\', '/')}/core/${model.packageName}.core"
                 dependencies[coreModuleName] = coreAssetPath
             }
+            Boolean hasFileProperty = domainModelService.hasFileProperty(grailsDomainClass)
+            Boolean hasTimeZoneProperty = domainModelService.hasTimeZoneProperty(grailsDomainClass)
+
+            if (hasFileProperty) {
+                render template: template("angular/javascripts/directives/fileModel.js"),
+                        destination: file("${basePath}/${modulePath}/directives/fileModel.js"),
+                        model: [moduleName: moduleName],
+                        overwrite: true
+            }
+
+            if (hasTimeZoneProperty) {
+                render template: template("angular/javascripts/services/timeZoneService.js"),
+                        destination: file("${basePath}/${modulePath}/services/timeZoneService.js"),
+                        model: [moduleName: moduleName, timeZones: JsonOutput.prettyPrint(JsonOutput.toJson(domainModelService.timeZones))],
+                        overwrite: true
+            }
+
 
             dependencies['"ui.router"'] = '/angular/angular-ui-router'
 
@@ -84,6 +99,8 @@ class NgGenerateAllCommand implements GrailsApplicationCommand, ModelBuilder {
             }
 
             String controllerName = angularMarkupBuilder.controllerName
+
+
 
             render template: template('angular/javascripts/module.js'),
                     destination: file("${basePath}/${modulePath}/${moduleName}.js"),
@@ -116,7 +133,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand, ModelBuilder {
                     overwrite: true
 
 
-            Map artefactParams = model.asMap() << [moduleName: moduleName, controllerAs: controllerName]
+            Map artefactParams = model.asMap() << [moduleName: moduleName, controllerAs: controllerName, injectTimeZone: hasTimeZoneProperty]
 
             render template: template('angular/javascripts/controllers/createController.js'),
                    destination: file("${basePath}/${modulePath}/controllers/${model.propertyName}CreateController.js"),
@@ -150,8 +167,16 @@ class NgGenerateAllCommand implements GrailsApplicationCommand, ModelBuilder {
                        overwrite: true
             }
 
+            if (hasTimeZoneProperty) {
+                render template: template("angular/javascripts/services/timeZoneService.js"),
+                       destination: file("${basePath}/${modulePath}/services/timeZoneService.js"),
+                       model: [moduleName: moduleName, timeZones: JsonOutput.prettyPrint(JsonOutput.toJson(domainModelService.timeZones))],
+                       overwrite: true
+            }
+
         } catch (e) {
             println e.message
+            println e.cause
             println e.stackTrace
         }
         return true

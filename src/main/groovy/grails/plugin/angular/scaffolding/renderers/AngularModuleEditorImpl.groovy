@@ -18,7 +18,7 @@ class AngularModuleEditorImpl implements AngularModuleEditor {
             StringBuilder sb = new StringBuilder()
             final String moduleText = module.text
 
-            Matcher group = (moduleText =~ /(angular\.module)(.*),(\s*)(\[)/)
+            Matcher group = (moduleText =~ /(angular\.module)(.*?),(\s*)(\[)/)
             final String moduleDefinition = group[0][0]
             int startingIndex = moduleText.indexOf(moduleDefinition) + moduleDefinition.size() - 1
             sb.append(moduleText.substring(0, startingIndex))

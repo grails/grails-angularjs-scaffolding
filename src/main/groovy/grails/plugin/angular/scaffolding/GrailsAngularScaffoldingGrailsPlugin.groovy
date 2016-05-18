@@ -3,6 +3,7 @@ package grails.plugin.angular.scaffolding
 import grails.plugin.angular.scaffolding.element.AngularMarkupBuilderImpl
 import grails.plugin.angular.scaffolding.model.CacheableBeanPropertyAccessorFactory
 import grails.plugin.angular.scaffolding.model.DomainModelServiceImpl
+import grails.plugin.angular.scaffolding.renderers.AngularJsonRenderer
 import grails.plugin.angular.scaffolding.renderers.AngularModuleEditorImpl
 import grails.plugin.angular.scaffolding.renderers.AngularPropertyRendererImpl
 import grails.plugins.*
@@ -54,6 +55,8 @@ Brief summary/description of the plugin.
         angularElementBuilder(AngularMarkupBuilderImpl)
 
         beanPropertyAccessorFactory(CacheableBeanPropertyAccessorFactory)
+
+        angularByteArrayJsonRenderer(AngularJsonRenderer)
     }}
 
     void doWithDynamicMethods() {

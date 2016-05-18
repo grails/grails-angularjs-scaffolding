@@ -4,13 +4,16 @@ angular
     .module("${moduleName}")
     .controller("${className}CreateController", ${className}CreateController);
 
-function ${className}CreateController(${className}, \$state) {
+function ${className}CreateController(${className}, \$state<%= if (injectTimeZone) { ', timeZoneService' } %>) {
+
     var ${controllerAs} = this;
 
-    ${controllerAs}.part = new ${className}();
+    <%= if (injectTimeZone) { controllerAs+'.timeZoneList = timeZoneService.get();' } %>
+
+    ${controllerAs}.${propertyName} = new ${className}();
 
     ${controllerAs}.save${className} = function() {
-        ${controllerAs}.errors = [];
+        ${controllerAs}.errors = undefined;
         ${controllerAs}.${propertyName}.\$save({}, function() {
             \$state.go('${propertyName}.list');
         }, function(response) {

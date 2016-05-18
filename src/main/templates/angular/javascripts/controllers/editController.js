@@ -4,8 +4,10 @@ angular
     .module("${moduleName}")
     .controller("${className}EditController", ${className}EditController);
 
-function ${className}EditController(${className}, \$stateParams, \$state) {
+function ${className}EditController(${className}, \$stateParams, \$state<%= if (injectTimeZone) { ', timeZoneService' } %>) {
     var ${controllerAs} = this;
+
+    <%= if (injectTimeZone) { controllerAs+'.timeZoneList = timeZoneService.get();' } %>
 
     ${className}.get({id: \$stateParams.id}, function(data) {
         ${controllerAs}.${propertyName} = new ${className}(data);
@@ -14,7 +16,7 @@ function ${className}EditController(${className}, \$stateParams, \$state) {
     });
 
     ${controllerAs}.update${className} = function() {
-        ${controllerAs}.errors = [];
+        ${controllerAs}.errors = undefined;
         ${controllerAs}.${propertyName}.\$update(function() {
             \$state.go('${propertyName}.list');
         }, function(response) {

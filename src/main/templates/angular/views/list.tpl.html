@@ -16,8 +16,12 @@
         </thead>
         <tbody>
             <tr ng-class="{'even': \$index%2 == 0, 'odd': \$index%2 == 1}" ng-repeat="${propertyName} in ${controllerName ? controllerName + '.' : ''}${propertyName}s">
-                <% listProperties.each { %>
-                <td>${it.value}</td>
+                <% listProperties.eachWithIndex { prop, idx -> %>
+                    <% if(idx == 0) { %>
+                        <td><a ui-sref="${propertyName}.show({id: ${propertyName}.id})">${prop.value}</a></td>
+                    <% } else { %>
+                        <td>${prop.value}</td>
+                    <% } %>
                 <% } %>
             </tr>
         </tbody>

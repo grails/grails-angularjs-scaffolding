@@ -1,44 +1,24 @@
 package grails.plugin.angular.scaffolding.element
 
+import grails.core.GrailsDomainClassProperty
+import grails.plugin.angular.scaffolding.model.DomainModelService
 import grails.plugin.formfields.BeanPropertyAccessor
 import grails.util.GrailsNameUtils
 import grails.validation.ConstrainedProperty
 import groovy.json.JsonOutput
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import java.sql.Blob
 
 class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
 
+    @Autowired
+    DomainModelService domainModelService
+
     @Value('${grails.plugin.angular.scaffolding.controllerName:vm}')
     String controllerName
 
     private static final List<String> DECIMAL_TYPES = ['double', 'float', 'bigdecimal']
-
-    PropertyType getPropertyType(BeanPropertyAccessor property) {
-        if (property.propertyType in [String, null]) {
-            PropertyType.STRING
-        } else if (property.propertyType in [boolean, Boolean]) {
-            PropertyType.BOOLEAN
-        } else if (property.propertyType.isPrimitive() || property.propertyType in Number) {
-            PropertyType.NUMBER
-        } else if (property.propertyType in URL) {
-            PropertyType.URL
-        } else if (property.propertyType.isEnum()) {
-            PropertyType.ENUM
-        } else if (property.persistentProperty?.oneToOne || property.persistentProperty?.manyToOne || property.persistentProperty?.manyToMany) {
-            PropertyType.ASSOCIATION
-        } else if (property.persistentProperty?.oneToMany) {
-            PropertyType.ONETOMANY
-        } else if (property.propertyType in [Date, Calendar, java.sql.Date]) {
-            PropertyType.DATE
-        } else if (property.propertyType in java.sql.Time) {
-            PropertyType.TIME
-        } else if (property.propertyType in [byte[], Byte[], Blob]) {
-            PropertyType.FILE
-        } else if (property.propertyType in [TimeZone, Currency, Locale]) {
-            PropertyType.SPECIAL
-        }
-    }
 
     Map getStandardAttributes(BeanPropertyAccessor property) {
         final String objectName = GrailsNameUtils.getPropertyName(property.rootBeanType)
@@ -63,14 +43,11 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         }
         sb.append(GrailsNameUtils.getPropertyName(property.rootBeanType)).append('.')
         sb.append(property.pathFromRoot)
-        if (getPropertyType(property) == PropertyType.ENUM) {
-            sb.append(".name")
-        }
         "{{${sb.toString()}}}"
     }
 
     Closure renderProperty(BeanPropertyAccessor property) {
-        PropertyType elementType = getPropertyType(property)
+        PropertyType elementType = domainModelService.getPropertyType(property)
         switch(elementType) {
             case PropertyType.STRING:
                 renderString(property)
@@ -103,9 +80,15 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
                 renderFile(property)
                 break
             case PropertyType.SPECIAL:
-                // TODO case timezone,currency,locale
-                { -> }
+                if (property.propertyType == TimeZone) {
+                    renderTimeZone(property)
+                } else {
+                    // TODO case currency,locale
+                    { -> }
+                }
                 break
+            default:
+                { -> }
         }
     }
 
@@ -199,7 +182,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
             List keys = property.propertyType.values()*.name()
             List values = property.propertyType.values()
             keys.eachWithIndex { k, i ->
-                enumList.add([id: k, name: values[i]])
+                enumList.add([id: k, name: values[i].toString()])
             }
         }
 
@@ -210,7 +193,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         } else if (enumList) {
             attributes['ng-options'] = "${name}.id as ${name}.name for ${name} in ${JsonOutput.toJson(enumList)}"
         } else {
-            attributes['ng-options'] = "$name for $name in ${name}s"
+            attributes['ng-options'] = "$name for $name in ${controllerName}.${name}List"
         }
 
         { ->
@@ -244,6 +227,19 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         attributes['file-model'] = attributes.remove('ng-model')
         return { ->
             input(attributes)
+        }
+    }
+
+    Closure renderTimeZone(BeanPropertyAccessor property) {
+        Map attributes = getStandardAttributes(property)
+        String selected = TimeZone.default.ID
+
+        attributes['ng-init'] = "${attributes["ng-model"]} = '$selected'"
+        final String name = attributes.name
+        attributes['ng-options'] = "$name for $name in $controllerName.${name}List"
+
+        return { ->
+            select('', attributes)
         }
     }
 

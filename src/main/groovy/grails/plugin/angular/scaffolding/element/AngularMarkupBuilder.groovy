@@ -9,8 +9,6 @@ interface AngularMarkupBuilder {
 
     String getControllerName()
 
-    PropertyType getPropertyType(BeanPropertyAccessor property)
-
     Map getStandardAttributes(BeanPropertyAccessor property)
 
     String renderPropertyDisplay(BeanPropertyAccessor property, Boolean includeControllerName)
