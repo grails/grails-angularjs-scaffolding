@@ -13,7 +13,7 @@ function ${className}CreateController(${className}, \$state<%= injections ? ', '
     ${controllerAs}.save${className} = function() {
         ${controllerAs}.errors = undefined;
         ${controllerAs}.${propertyName}.\$save({}, function() {
-            \$state.go('${propertyName}.list');
+            \$state.go('${propertyName}.show', {id: ${controllerAs}.${propertyName}.id});
         }, function(response) {
             var data = response.data;
             if (data.hasOwnProperty('message')) {

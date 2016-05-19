@@ -10,6 +10,6 @@ function ${className}ListController(${className}) {
     var max = 10, offset = 0;
 
     ${className}.list({max: max, offset: offset}, function(data) {
-        ${controllerAs}.${propertyName}s = data;
+        ${controllerAs}.${propertyName}List = data;
     });
 }

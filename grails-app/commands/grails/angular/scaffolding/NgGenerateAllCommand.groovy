@@ -68,7 +68,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
             domainModelService.getShortListVisibleProperties(grailsDomainClass).each {
                 BeanPropertyAccessor propertyAccessor = beanPropertyAccessorFactory.accessorFor(bean, it.name)
-                listProperties[it] = angularMarkupBuilder.renderPropertyDisplay(propertyAccessor, false)
+                listProperties[it] = angularPropertyRenderer.renderPropertyDisplay(propertyAccessor, false)
             }
 
             AngularModel module = model(domainClass.javaClass)
@@ -104,11 +104,13 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                     overwrite: true
 
             Map createEditInjections = [:]
+            Map domainInjections = [:]
 
             associatedProperties.each { BeanPropertyAccessor property ->
                 AngularModel associatedModule = handleAssociatedProperty(property)
                 angularModuleEditor.addDependency(module.file, associatedModule)
                 createEditInjections[associatedModule.className] = "${controllerName}.${associatedModule.propertyName}List = ${associatedModule.className}.list();"
+                domainInjections[associatedModule.className] = associatedModule.propertyName
             }
 
             final String modulePath = module.modulePath
@@ -194,7 +196,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
             render template: template("angular/javascripts/${hasFileProperty ? "multipartDomain" : "domain"}.js"),
                    destination: file("${basePath}/${modulePath}/domain/${module.className}.js"),
-                   model: artefactParams,
+                   model: artefactParams << [injections: domainInjections],
                    overwrite: true
 
 
@@ -208,7 +210,6 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
     }
 
     AngularModel handleAssociatedProperty(BeanPropertyAccessor property) {
-        println "in handle associated " + property.propertyType.name
         AngularModel module = model(property.propertyType)
 
         //if (!module.exists()) {
@@ -237,7 +238,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
             render template: template("angular/javascripts/${domainModelService.hasPropertyType(property.beanClass, PropertyType.FILE) ? "multipartDomain" : "domain"}.js"),
                     destination: file("${basePath}/${modulePath}/domain/${module.className}.js"),
-                    model: module.asMap() << [controllerAs: controllerName],
+                    model: module.asMap() << [controllerAs: controllerName, injections: [:]],
                     overwrite: true
        // }
 

@@ -32,14 +32,28 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         attributes
     }
 
-    String renderPropertyDisplay(BeanPropertyAccessor property, Boolean includeControllerName) {
+    protected buildPropertyPath(BeanPropertyAccessor property, Boolean includeControllerName) {
         StringBuilder sb = new StringBuilder()
         if (includeControllerName) {
             sb.append(controllerName).append('.')
         }
         sb.append(GrailsNameUtils.getPropertyName(property.rootBeanType)).append('.')
         sb.append(property.pathFromRoot)
-        "{{${sb.toString()}}}"
+        sb.toString()
+    }
+
+    Closure renderPropertyDisplay(BeanPropertyAccessor property, Boolean includeControllerName) {
+        return { ->
+            span("{{${buildPropertyPath(property, includeControllerName)}}}")
+        }
+    }
+
+    Closure renderAssociationDisplay(BeanPropertyAccessor property, Boolean includeControllerName) {
+        final String propertyPath = buildPropertyPath(property, includeControllerName)
+        final String propertyName = GrailsNameUtils.getPropertyName(property.persistentProperty.type)
+        return { ->
+            a("{{${propertyPath}.toString()}}", ["ui-sref": "${propertyName}.show({id: ${propertyPath}.id})"])
+        }
     }
 
     Closure renderProperty(BeanPropertyAccessor property) {
@@ -204,7 +218,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
     Closure renderAssociation(BeanPropertyAccessor property) {
         Map attributes = getStandardAttributes(property)
         final String name = attributes.name
-        attributes['ng-options'] = "${name}.id as $name for $name in ${controllerName}.${name}List"
+        attributes['ng-options'] = "${name} as $name for $name in ${controllerName}.${name}List track by ${name}.id"
 
         if (property.persistentProperty.manyToMany) {
             attributes["multiple"] = ""

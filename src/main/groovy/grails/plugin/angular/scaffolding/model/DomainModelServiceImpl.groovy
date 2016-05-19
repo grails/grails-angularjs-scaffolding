@@ -5,11 +5,25 @@ import grails.core.GrailsDomainClassProperty
 import grails.plugin.angular.scaffolding.element.PropertyType
 import grails.plugin.formfields.BeanPropertyAccessor
 import grails.util.GrailsClassUtils
+import grails.validation.Constrained
+import org.grails.datastore.mapping.model.MappingContext
+import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.Embedded
+import org.grails.datastore.mapping.model.types.ManyToMany
+import org.grails.datastore.mapping.model.types.ManyToOne
+import org.grails.datastore.mapping.model.types.OneToMany
+import org.grails.datastore.mapping.model.types.OneToOne
 import org.grails.validation.DomainClassPropertyComparator
+import org.grails.validation.GrailsDomainClassValidator
+import org.springframework.beans.factory.annotation.Autowired
 
 import java.sql.Blob
 
 class DomainModelServiceImpl implements DomainModelService {
+
+    @Autowired
+    MappingContext grailsDomainClassMappingContext
 
     List<String> currencyCodes = ['EUR', 'XCD', 'USD', 'XOF', 'NOK', 'AUD',
                                   'XAF', 'NZD', 'MAD', 'DKK', 'GBP', 'CHF',
@@ -25,12 +39,35 @@ class DomainModelServiceImpl implements DomainModelService {
             blacklist.addAll(scaffoldProp.exclude)
         }
         properties.removeAll { it.name in blacklist }
-        properties.removeAll { !it.domainClass.constrainedProperties[it.name]?.display }
+        properties.removeAll {
+            Constrained constraints = (Constrained)domainClass.constrainedProperties[it.name]
+            !constraints.display
+        }
         properties.removeAll { it.derived }
 
         sort(properties, domainClass)
         properties
     }
+
+/*    List<PersistentProperty> getEditableProperties(PersistentEntity domainClass) {
+        List<PersistentProperty> properties = domainClass.persistentProperties as List
+        List blacklist = ['dateCreated', 'lastUpdated']
+        def scaffoldProp = GrailsClassUtils.getStaticPropertyValue(domainClass.javaClass, 'scaffold')
+        if (scaffoldProp) {
+            blacklist.addAll(scaffoldProp.exclude)
+        }
+        GrailsDomainClass grailsDomainClass = ((GrailsDomainClassValidator) grailsDomainClassMappingContext.getEntityValidator(domainClass)).domainClass
+
+        properties.removeAll { it.name in blacklist }
+        properties.removeAll {
+            Constrained constraints = (Constrained)grailsDomainClass.constrainedProperties[it.name]
+            !constraints.display
+        }
+        properties.removeAll { it.mapping instanceof PropertyConfig classMapping.mappedForm..properties.derived }
+
+        sort(grailsDomainClass, properties)
+        properties
+    }*/
 
     List<GrailsDomainClassProperty> getVisibleProperties(GrailsDomainClass domainClass) {
         List<GrailsDomainClassProperty> properties = domainClass.persistentProperties
@@ -49,7 +86,11 @@ class DomainModelServiceImpl implements DomainModelService {
     void sort(List<GrailsDomainClassProperty> properties, GrailsDomainClass domainClass) {
         Collections.sort(properties, new DomainClassPropertyComparator(domainClass))
     }
-    
+
+/*    void sort(GrailsDomainClass domainClass, List<PersistentProperty> properties) {
+        Collections.sort(properties, new PersistentPropertyComparator(domainClass))
+    }*/
+
     protected Boolean isString(Class clazz) {
         clazz in [String, null]
     }
@@ -153,6 +194,36 @@ class DomainModelServiceImpl implements DomainModelService {
             PropertyType.LOCALE
         }
     }
+
+   /* PropertyType getPropertyType(PersistentProperty property) {
+        if (isString(property.type)) {
+            PropertyType.STRING
+        } else if (isBoolean(property.type)) {
+            PropertyType.BOOLEAN
+        } else if (isNumber(property.type)) {
+            PropertyType.NUMBER
+        } else if (isURL(property.type)) {
+            PropertyType.URL
+        } else if (isEnum(property.type)) {
+            PropertyType.ENUM
+        } else if (property instanceof OneToOne || property instanceof ManyToOne || property instanceof ManyToMany) {
+            PropertyType.ASSOCIATION
+        } else if (property instanceof OneToMany) {
+            PropertyType.ONETOMANY
+        } else if (isDate(property.type)) {
+            PropertyType.DATE
+        } else if (isTime(property.type)) {
+            PropertyType.TIME
+        } else if (isFile(property.type)) {
+            PropertyType.FILE
+        } else if (isTimeZone(property.type)) {
+            PropertyType.TIMEZONE
+        } else if (isCurrency(property.type)) {
+            PropertyType.CURRENCY
+        } else if (isLocale(property.type)) {
+            PropertyType.LOCALE
+        }
+    }*/
     
     protected Boolean hasProperty(GrailsDomainClass domainClass, Closure closure) {
         getEditableProperties(domainClass).any {
@@ -169,6 +240,22 @@ class DomainModelServiceImpl implements DomainModelService {
             getPropertyType(property) == propertyType
         }
     }
+
+/*    protected Boolean hasProperty(PersistentEntity domainClass, Closure closure) {
+        getEditableProperties(domainClass).any {
+            if (it instanceof Embedded) {
+                hasProperty(it.associatedEntity, closure)
+            } else {
+                closure.call(it)
+            }
+        }
+    }
+
+    Boolean hasPropertyType(PersistentEntity domainClass, PropertyType propertyType) {
+        hasProperty(domainClass) { GrailsDomainClassProperty property ->
+            getPropertyType(property) == propertyType
+        }
+    }*/
 
     protected String formatTimeZone(TimeZone timeZone) {
         Date date = new Date()

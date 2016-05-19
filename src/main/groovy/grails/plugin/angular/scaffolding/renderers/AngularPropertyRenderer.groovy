@@ -12,6 +12,8 @@ interface AngularPropertyRenderer {
 
     String renderDisplay(def bean, GrailsDomainClass domainClass)
 
+    String renderPropertyDisplay(BeanPropertyAccessor property, Boolean includeControllerName)
+
     String getLabelText(BeanPropertyAccessor property)
 
     String resolveMessage(List<String> keysInPreferenceOrder, String defaultMessage)

@@ -10,7 +10,6 @@ import grails.plugin.formfields.FormFieldsTemplateService
 import groovy.xml.MarkupBuilder
 import org.grails.buffer.FastStringWriter
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.MessageSource
 
 import javax.annotation.Resource
@@ -111,19 +110,37 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
             span([id: "${property.pathFromRoot}-label", class: "property-label"], getLabelText(property))
             div([class: "property-value", "aria-labelledby": "${property.pathFromRoot}-label"]) {
                 def persistentProperty = property.persistentProperty
-                if (persistentProperty?.association) {
-                    if (persistentProperty.embedded) {
-                        renderDisplay(bean, persistentProperty.component, markupBuilder, property)
-                    }
-                    /* else if (persistentProperty.oneToMany || persistentProperty.manyToMany) {
-                        return displayAssociationList(model.value, persistentProperty.referencedDomainClass)
-                    } else {
-                        return displayAssociation(model.value, persistentProperty.referencedDomainClass)
-                    }*/
+                if (persistentProperty?.association && persistentProperty.embedded) {
+                    renderDisplay(bean, persistentProperty.component, markupBuilder, property)
                 } else {
-                    span(angularMarkupBuilder.renderPropertyDisplay(property, true))
+                    renderPropertyDisplay(property, true, markupBuilder)
                 }
             }
+        }
+    }
+
+    String renderPropertyDisplay(BeanPropertyAccessor property, Boolean includeControllerName) {
+        outputMarkupContent { MarkupBuilder markupBuilder ->
+            renderPropertyDisplay(property, includeControllerName, markupBuilder)
+        }
+    }
+
+    protected void renderPropertyDisplay(BeanPropertyAccessor property, Boolean includeControllerName, MarkupBuilder markupBuilder) {
+        def persistentProperty = property.persistentProperty
+        Closure propertyDisplay
+        if (persistentProperty?.association) {
+            if (persistentProperty.oneToMany || persistentProperty.manyToMany) {
+                null
+                //return displayAssociationList(model.value, persistentProperty.referencedDomainClass)
+            } else {
+                propertyDisplay = angularMarkupBuilder.renderAssociationDisplay(property, includeControllerName)
+            }
+        } else {
+            propertyDisplay = angularMarkupBuilder.renderPropertyDisplay(property, includeControllerName)
+        }
+        if (propertyDisplay) {
+            propertyDisplay.delegate = markupBuilder
+            propertyDisplay.call()
         }
     }
 

@@ -11,7 +11,9 @@ interface AngularMarkupBuilder {
 
     Map getStandardAttributes(BeanPropertyAccessor property)
 
-    String renderPropertyDisplay(BeanPropertyAccessor property, Boolean includeControllerName)
+    Closure renderPropertyDisplay(BeanPropertyAccessor property, Boolean includeControllerName)
+
+    Closure renderAssociationDisplay(BeanPropertyAccessor property, Boolean includeControllerName)
 
     Closure renderProperty(BeanPropertyAccessor property)
 
