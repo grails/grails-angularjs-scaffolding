@@ -13,7 +13,7 @@ import static grails.validation.ConstrainedProperty.BLANK_CONSTRAINT
 
 class DomainPropertyImpl implements DomainProperty {
 
-    @Delegate PersistentProperty property
+    @Delegate PersistentProperty persistentProperty
     PersistentProperty rootProperty
     protected GrailsDomainClass grailsDomainClass
     PersistentEntity domainClass
@@ -24,7 +24,7 @@ class DomainPropertyImpl implements DomainProperty {
     protected Boolean trimStrings
 
     DomainPropertyImpl(PersistentProperty persistentProperty, MappingContext mappingContext) {
-        this.property = persistentProperty
+        this.persistentProperty = persistentProperty
         this.domainClass = persistentProperty.owner
         this.grailsDomainClass = ((GrailsDomainClassValidator) mappingContext.getEntityValidator(domainClass)).domainClass
         this.constraints = (Constrained)grailsDomainClass.constrainedProperties[name]
@@ -38,15 +38,15 @@ class DomainPropertyImpl implements DomainProperty {
 
     void setRootProperty(PersistentProperty rootProperty) {
         this.rootProperty = rootProperty
-        this.pathFromRoot = "${rootProperty.name}.${property.name}"
+        this.pathFromRoot = "${rootProperty.name}.${name}"
     }
 
     Class getRootBeanType() {
-        (rootProperty ?: property).owner.javaClass
+        (rootProperty ?: persistentProperty).owner.javaClass
     }
 
     Class getBeanType() {
-        property.owner.javaClass
+        owner.javaClass
     }
 
     boolean isRequired() {

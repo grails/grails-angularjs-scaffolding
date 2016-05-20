@@ -122,9 +122,9 @@ class DomainModelServiceImpl implements DomainModelService {
             PropertyType.URL
         } else if (isEnum(property.type)) {
             PropertyType.ENUM
-        } else if (property.property instanceof OneToOne || property.property instanceof ManyToOne || property.property instanceof ManyToMany) {
+        } else if (property.persistentProperty instanceof OneToOne || property.persistentProperty instanceof ManyToOne || property.persistentProperty instanceof ManyToMany) {
             PropertyType.ASSOCIATION
-        } else if (property.property instanceof OneToMany) {
+        } else if (property.persistentProperty instanceof OneToMany) {
             PropertyType.ONETOMANY
         } else if (isDate(property.type)) {
             PropertyType.DATE
@@ -143,7 +143,7 @@ class DomainModelServiceImpl implements DomainModelService {
 
     protected Boolean hasProperty(PersistentEntity domainClass, Closure closure) {
         getEditableProperties(domainClass).any { DomainProperty domainProperty ->
-            PersistentProperty property = domainProperty.property
+            PersistentProperty property = domainProperty.persistentProperty
             if (property instanceof Embedded) {
                 hasProperty(property.associatedEntity, closure)
             } else {

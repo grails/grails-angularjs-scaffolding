@@ -222,7 +222,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         final String name = attributes.name
         attributes['ng-options'] = "${name} as $name for $name in ${controllerName}.${name}List track by ${name}.id"
 
-        if (property.property instanceof ManyToMany) {
+        if (property.persistentProperty instanceof ManyToMany) {
             attributes["multiple"] = ""
         }
 

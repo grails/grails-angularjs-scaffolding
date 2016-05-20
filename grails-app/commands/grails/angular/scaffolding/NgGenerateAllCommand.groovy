@@ -44,7 +44,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
             List<DomainProperty> associatedProperties = []
 
             for (property in domainModelService.getEditableProperties(domainClass)) {
-                if (property.property instanceof Embedded) {
+                if (property.persistentProperty instanceof Embedded) {
                     formFields.add(angularPropertyRenderer.renderEditEmbedded(property))
                 } else {
                     formFields.add(angularPropertyRenderer.renderEdit(property))

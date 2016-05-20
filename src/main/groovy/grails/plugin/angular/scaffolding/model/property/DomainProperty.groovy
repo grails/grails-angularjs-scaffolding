@@ -7,7 +7,7 @@ interface DomainProperty extends PersistentProperty, Comparable<DomainProperty> 
 
     String getPathFromRoot()
 
-    PersistentProperty getProperty()
+    PersistentProperty getPersistentProperty()
 
     PersistentEntity getDomainClass()
 

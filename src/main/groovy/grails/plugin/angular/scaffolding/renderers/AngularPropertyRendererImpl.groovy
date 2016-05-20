@@ -55,7 +55,7 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
         outputMarkupContent { MarkupBuilder markupBuilder ->
             fieldset(class: "embedded ${formFieldsTemplateService.toPropertyNameFormat(property.type)}") {
                 legend(legendText)
-                domainModelService.getEditableProperties(((Embedded)property.property).associatedEntity).each { DomainProperty embedded ->
+                domainModelService.getEditableProperties(((Embedded)property.persistentProperty).associatedEntity).each { DomainProperty embedded ->
                     embedded.rootProperty = property
                     renderEdit(embedded, markupBuilder)
                 }
@@ -115,7 +115,7 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
         markupBuilder.li(class: 'fieldcontain') {
             span([id: "${property.pathFromRoot}-label", class: "property-label"], getLabelText(property))
             div([class: "property-value", "aria-labelledby": "${property.pathFromRoot}-label"]) {
-                PersistentProperty persistentProperty = property.property
+                PersistentProperty persistentProperty = property.persistentProperty
                 if (persistentProperty instanceof Embedded) {
                     renderDisplay(persistentProperty.associatedEntity, markupBuilder, property)
                 } else {
@@ -132,7 +132,7 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
     }
 
     protected void renderPropertyDisplay(DomainProperty property, Boolean includeControllerName, MarkupBuilder markupBuilder) {
-        PersistentProperty persistentProperty = property.property
+        PersistentProperty persistentProperty = property.persistentProperty
         Closure propertyDisplay
         if (persistentProperty instanceof Association) {
             if (persistentProperty instanceof OneToMany || persistentProperty instanceof ManyToMany) {
