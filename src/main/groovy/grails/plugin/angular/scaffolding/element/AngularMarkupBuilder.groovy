@@ -1,6 +1,6 @@
 package grails.plugin.angular.scaffolding.element
 
-import grails.plugin.formfields.BeanPropertyAccessor
+import grails.plugin.angular.scaffolding.model.property.DomainProperty
 
 /**
  * Created by Jim on 5/14/2016.
@@ -9,30 +9,30 @@ interface AngularMarkupBuilder {
 
     String getControllerName()
 
-    Map getStandardAttributes(BeanPropertyAccessor property)
+    Map getStandardAttributes(DomainProperty property)
 
-    Closure renderPropertyDisplay(BeanPropertyAccessor property, Boolean includeControllerName)
+    Closure renderPropertyDisplay(DomainProperty property, Boolean includeControllerName)
 
-    Closure renderAssociationDisplay(BeanPropertyAccessor property, Boolean includeControllerName)
+    Closure renderAssociationDisplay(DomainProperty property, Boolean includeControllerName)
 
-    Closure renderProperty(BeanPropertyAccessor property)
+    Closure renderProperty(DomainProperty property)
 
-    Closure renderString(BeanPropertyAccessor property)
+    Closure renderString(DomainProperty property)
 
-    Closure renderInput(BeanPropertyAccessor property)
+    Closure renderInput(DomainProperty property)
 
-    Closure renderBoolean(BeanPropertyAccessor property)
+    Closure renderBoolean(DomainProperty property)
 
-    Closure renderNumber(BeanPropertyAccessor property)
+    Closure renderNumber(DomainProperty property)
 
-    Closure renderURL(BeanPropertyAccessor property)
+    Closure renderURL(DomainProperty property)
 
-    Closure renderSelect(BeanPropertyAccessor property)
+    Closure renderSelect(DomainProperty property)
 
-    Closure renderTextArea(BeanPropertyAccessor property)
+    Closure renderTextArea(DomainProperty property)
 
-    Closure renderDate(BeanPropertyAccessor property)
+    Closure renderDate(DomainProperty property)
 
-    Closure renderTime(BeanPropertyAccessor property)
+    Closure renderTime(DomainProperty property)
 
 }

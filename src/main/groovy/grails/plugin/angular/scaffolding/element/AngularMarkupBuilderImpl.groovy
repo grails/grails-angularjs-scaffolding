@@ -1,10 +1,12 @@
 package grails.plugin.angular.scaffolding.element
 
 import grails.plugin.angular.scaffolding.model.DomainModelService
-import grails.plugin.formfields.BeanPropertyAccessor
+import grails.plugin.angular.scaffolding.model.property.DomainProperty
+import grails.plugin.angular.scaffolding.model.property.PropertyType
 import grails.util.GrailsNameUtils
-import grails.validation.ConstrainedProperty
+import grails.validation.Constrained
 import groovy.json.JsonOutput
+import org.grails.datastore.mapping.model.types.ManyToMany
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 
@@ -16,7 +18,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
     @Value('${grails.plugin.angular.scaffolding.controllerName:vm}')
     String controllerName
 
-    Map getStandardAttributes(BeanPropertyAccessor property) {
+    Map getStandardAttributes(DomainProperty property) {
         final String objectName = GrailsNameUtils.getPropertyName(property.rootBeanType)
         final String name = property.pathFromRoot
         Map attributes = [:]
@@ -32,7 +34,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         attributes
     }
 
-    protected buildPropertyPath(BeanPropertyAccessor property, Boolean includeControllerName) {
+    protected buildPropertyPath(DomainProperty property, Boolean includeControllerName) {
         StringBuilder sb = new StringBuilder()
         if (includeControllerName) {
             sb.append(controllerName).append('.')
@@ -42,21 +44,21 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         sb.toString()
     }
 
-    Closure renderPropertyDisplay(BeanPropertyAccessor property, Boolean includeControllerName) {
+    Closure renderPropertyDisplay(DomainProperty property, Boolean includeControllerName) {
         return { ->
             span("{{${buildPropertyPath(property, includeControllerName)}}}")
         }
     }
 
-    Closure renderAssociationDisplay(BeanPropertyAccessor property, Boolean includeControllerName) {
+    Closure renderAssociationDisplay(DomainProperty property, Boolean includeControllerName) {
         final String propertyPath = buildPropertyPath(property, includeControllerName)
-        final String propertyName = GrailsNameUtils.getPropertyName(property.persistentProperty.type)
+        final String propertyName = GrailsNameUtils.getPropertyName(property.type)
         return { ->
             a("{{${propertyPath}.toString()}}", ["ui-sref": "${propertyName}.show({id: ${propertyPath}.id})"])
         }
     }
 
-    Closure renderProperty(BeanPropertyAccessor property) {
+    Closure renderProperty(DomainProperty property) {
         PropertyType elementType = domainModelService.getPropertyType(property)
         switch(elementType) {
             case PropertyType.STRING:
@@ -104,8 +106,8 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         }
     }
 
-    Closure renderString(BeanPropertyAccessor property) {
-        ConstrainedProperty constraint = property.constraints
+    Closure renderString(DomainProperty property) {
+        Constrained constraint = property.constraints
         if (constraint?.inList) {
             renderSelect(property)
         } else {
@@ -117,7 +119,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         }
     }
 
-    Closure renderInput(BeanPropertyAccessor property) {
+    Closure renderInput(DomainProperty property) {
         Map attributes = getStandardAttributes(property)
         if (property.constraints?.password) {
             attributes.type = "password"
@@ -141,13 +143,13 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         }
     }
 
-    Closure renderBoolean(BeanPropertyAccessor property) {
+    Closure renderBoolean(DomainProperty property) {
         renderSimpleInput(property, "checkbox")
     }
 
-    Closure renderNumber(BeanPropertyAccessor property) {
+    Closure renderNumber(DomainProperty property) {
         Map attributes = getStandardAttributes(property)
-        ConstrainedProperty constraint = property.constraints
+        Constrained constraint = property.constraints
         if (constraint?.inList) {
             renderSelect(property)
         } else {
@@ -156,7 +158,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
                 attributes.min = property.constraints.range.from
                 attributes.max = property.constraints.range.to
             } else {
-                String typeName = property.propertyType.simpleName.toLowerCase()
+                String typeName = property.type.simpleName.toLowerCase()
 
                 attributes.type = "number"
 
@@ -180,19 +182,19 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         }
     }
 
-    Closure renderURL(BeanPropertyAccessor property) {
+    Closure renderURL(DomainProperty property) {
         renderSimpleInput(property, "url")
     }
 
-    Closure renderSelect(BeanPropertyAccessor property) {
+    Closure renderSelect(DomainProperty property) {
         List inList
         List<Map> enumList = []
         Map attributes = getStandardAttributes(property)
 
         inList = property.constraints?.inList
-        if (property.propertyType.isEnum()) {
-            List keys = property.propertyType.values()*.name()
-            List values = property.propertyType.values()
+        if (property.type.isEnum()) {
+            List keys = property.type.values()*.name()
+            List values = property.type.values()
             keys.eachWithIndex { k, i ->
                 enumList.add([id: k, name: values[i].toString()])
             }
@@ -215,12 +217,12 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         }
     }
 
-    Closure renderAssociation(BeanPropertyAccessor property) {
+    Closure renderAssociation(DomainProperty property) {
         Map attributes = getStandardAttributes(property)
         final String name = attributes.name
         attributes['ng-options'] = "${name} as $name for $name in ${controllerName}.${name}List track by ${name}.id"
 
-        if (property.persistentProperty.manyToMany) {
+        if (property.property instanceof ManyToMany) {
             attributes["multiple"] = ""
         }
 
@@ -229,7 +231,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         }
     }
 
-    Closure renderTextArea(BeanPropertyAccessor property) {
+    Closure renderTextArea(DomainProperty property) {
         Map attributes = getStandardAttributes(property)
         if (property.constraints?.maxSize) {
             attributes.maxlength = property.constraints.maxSize
@@ -239,15 +241,15 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         }
     }
 
-    Closure renderDate(BeanPropertyAccessor property) {
+    Closure renderDate(DomainProperty property) {
         renderSimpleInput(property, "date")
     }
 
-    Closure renderTime(BeanPropertyAccessor property) {
+    Closure renderTime(DomainProperty property) {
         renderSimpleInput(property, "datetime-local")
     }
 
-    Closure renderFile(BeanPropertyAccessor property) {
+    Closure renderFile(DomainProperty property) {
         Map attributes = getStandardAttributes(property)
         attributes.type = "file"
         attributes['file-model'] = attributes.remove('ng-model')
@@ -256,12 +258,11 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         }
     }
 
-    Closure renderTimeZone(BeanPropertyAccessor property) {
+    Closure renderTimeZone(DomainProperty property) {
         Map attributes = getStandardAttributes(property)
         String selected = TimeZone.default.ID
 
         attributes['ng-init'] = "${attributes["ng-model"]} = '$selected'"
-        final String name = attributes.name
         attributes['ng-options'] = "key as value for (key , value) in ${controllerName}.timeZoneList"
 
         return { ->
@@ -269,7 +270,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         }
     }
 
-    Closure renderCurrency(BeanPropertyAccessor property) {
+    Closure renderCurrency(DomainProperty property) {
         Map attributes = getStandardAttributes(property)
 
         Currency currency = Currency.getInstance(Locale.default)
@@ -284,7 +285,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         }
     }
 
-    Closure renderLocale(BeanPropertyAccessor property) {
+    Closure renderLocale(DomainProperty property) {
         Map attributes = getStandardAttributes(property)
 
         Locale locale = Locale.default
@@ -298,7 +299,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
         }
     }
 
-    private Closure renderSimpleInput(BeanPropertyAccessor property, String type) {
+    private Closure renderSimpleInput(DomainProperty property, String type) {
         Map attributes = getStandardAttributes(property)
         attributes.type = type
         return { ->

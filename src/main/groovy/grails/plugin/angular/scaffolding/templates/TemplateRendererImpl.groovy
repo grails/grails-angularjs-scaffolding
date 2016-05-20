@@ -15,7 +15,6 @@ import org.grails.io.support.ResourceLoader
  * API for locating and rendering templates in the code generation layer
  *
  * @author Graeme Rocher
- * @author James Kleeh
  * @since 3.2
  */
 class TemplateRendererImpl implements TemplateRenderer {

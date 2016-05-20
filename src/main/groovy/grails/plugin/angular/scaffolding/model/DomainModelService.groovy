@@ -1,28 +1,28 @@
 package grails.plugin.angular.scaffolding.model
 
-import grails.core.GrailsDomainClass
-import grails.core.GrailsDomainClassProperty
-import grails.plugin.angular.scaffolding.element.PropertyType
-import grails.plugin.formfields.BeanPropertyAccessor
+import grails.plugin.angular.scaffolding.model.property.PropertyType
+import grails.plugin.angular.scaffolding.model.property.DomainProperty
+import grails.plugin.angular.scaffolding.model.property.DomainPropertyFactory
+import org.grails.datastore.mapping.model.PersistentEntity
 
 /**
  * Created by Jim on 5/12/2016.
  */
 interface DomainModelService {
 
-    List<GrailsDomainClassProperty> getEditableProperties(GrailsDomainClass domainClass)
+    List<DomainProperty> getEditableProperties(PersistentEntity domainClass)
 
-    List<GrailsDomainClassProperty> getVisibleProperties(GrailsDomainClass domainClass)
+    List<DomainProperty> getVisibleProperties(PersistentEntity domainClass)
 
-    List<GrailsDomainClassProperty> getShortListVisibleProperties(GrailsDomainClass domainClass)
+    List<DomainProperty> getShortListVisibleProperties(PersistentEntity domainClass)
 
-    void sort(List<GrailsDomainClassProperty> properties, GrailsDomainClass domainClass)
+    PropertyType getPropertyType(DomainProperty property)
 
-    PropertyType getPropertyType(BeanPropertyAccessor property)
+    Boolean hasPropertyType(PersistentEntity domainClass, PropertyType propertyType)
 
-    PropertyType getPropertyType(GrailsDomainClassProperty property)
+    DomainPropertyFactory getDomainPropertyFactory()
 
-    Boolean hasPropertyType(GrailsDomainClass domainClass, PropertyType propertyType)
+    void setDomainPropertyFactory(DomainPropertyFactory domainPropertyFactory)
 
     Map<String, String> getTimeZones()
 

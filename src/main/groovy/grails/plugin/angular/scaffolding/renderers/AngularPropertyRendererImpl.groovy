@@ -1,14 +1,18 @@
 package grails.plugin.angular.scaffolding.renderers
 
-import grails.core.GrailsDomainClass
-import grails.core.GrailsDomainClassProperty
 import grails.plugin.angular.scaffolding.element.*
 import grails.plugin.angular.scaffolding.model.DomainModelService
-import grails.plugin.formfields.BeanPropertyAccessor
-import grails.plugin.formfields.BeanPropertyAccessorFactory
+import grails.plugin.angular.scaffolding.model.property.DomainProperty
+import grails.plugin.angular.scaffolding.model.property.DomainPropertyFactory
 import grails.plugin.formfields.FormFieldsTemplateService
 import groovy.xml.MarkupBuilder
 import org.grails.buffer.FastStringWriter
+import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.Association
+import org.grails.datastore.mapping.model.types.Embedded
+import org.grails.datastore.mapping.model.types.ManyToMany
+import org.grails.datastore.mapping.model.types.OneToMany
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSource
 
@@ -23,13 +27,13 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
     DomainModelService domainModelService
 
     @Autowired
-    BeanPropertyAccessorFactory beanPropertyAccessorFactory
-
-    @Autowired
     FormFieldsTemplateService formFieldsTemplateService
 
     @Autowired
     AngularMarkupBuilderImpl angularMarkupBuilder
+
+    @Autowired
+    DomainPropertyFactory domainPropertyFactory
 
 
     static String outputMarkupContent(Closure closure) {
@@ -46,25 +50,26 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
         writer.toString()
     }
 
-    String renderEditEmbedded(def bean, BeanPropertyAccessor property) {
+    String renderEditEmbedded(DomainProperty property) {
         String legendText = resolveMessage(property.labelKeys, property.defaultLabel)
         outputMarkupContent { MarkupBuilder markupBuilder ->
-            fieldset(class: "embedded ${formFieldsTemplateService.toPropertyNameFormat(property.propertyType)}") {
+            fieldset(class: "embedded ${formFieldsTemplateService.toPropertyNameFormat(property.type)}") {
                 legend(legendText)
-                domainModelService.getEditableProperties(property.persistentProperty.component).each { GrailsDomainClassProperty embedded ->
-                    renderEdit(beanPropertyAccessorFactory.accessorFor(bean, "${property.pathFromRoot}.${embedded.name}"), markupBuilder)
+                domainModelService.getEditableProperties(((Embedded)property.property).associatedEntity).each { DomainProperty embedded ->
+                    embedded.rootProperty = property
+                    renderEdit(embedded, markupBuilder)
                 }
             }
         }
     }
 
-    String renderEdit(BeanPropertyAccessor property) {
+    String renderEdit(DomainProperty property) {
         outputMarkupContent { MarkupBuilder markupBuilder ->
             renderEdit(property, markupBuilder)
         }
     }
 
-    protected void renderEdit(BeanPropertyAccessor property, MarkupBuilder markupBuilder) {
+    protected void renderEdit(DomainProperty property, MarkupBuilder markupBuilder) {
         List classes = ['fieldcontain']
         if (property.required) {
             classes << 'required'
@@ -81,37 +86,38 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
         }
     }
 
-    String renderDisplay(def bean, GrailsDomainClass domainClass) {
+    String renderDisplay(PersistentEntity domainClass) {
         outputMarkupContent { MarkupBuilder markupBuilder ->
-            renderDisplay(bean, domainClass, markupBuilder)
+            renderDisplay(domainClass, markupBuilder)
         }
     }
 
-    protected void renderDisplay(GrailsDomainClass domainClass, MarkupBuilder markupBuilder, Closure closure) {
-        markupBuilder.ol(class: "property-list ${domainClass.propertyName}") {
+    protected void renderDisplay(PersistentEntity domainClass, MarkupBuilder markupBuilder, Closure closure) {
+        markupBuilder.ol(class: "property-list ${domainClass.decapitalizedName}") {
             domainModelService.getVisibleProperties(domainClass).each(closure)
         }
     }
 
-    protected void renderDisplay(def bean, GrailsDomainClass domainClass, MarkupBuilder markupBuilder) {
-        renderDisplay(domainClass, markupBuilder) { GrailsDomainClassProperty property ->
-            renderDisplayField(bean, beanPropertyAccessorFactory.accessorFor(bean, property.name), markupBuilder)
+    protected void renderDisplay(PersistentEntity domainClass, MarkupBuilder markupBuilder) {
+        renderDisplay(domainClass, markupBuilder) { DomainProperty property ->
+            renderDisplayField(property, markupBuilder)
         }
     }
 
-    protected void renderDisplay(def bean, GrailsDomainClass domainClass, MarkupBuilder markupBuilder, BeanPropertyAccessor parentProperty) {
-        renderDisplay(domainClass, markupBuilder) { GrailsDomainClassProperty property ->
-            renderDisplayField(bean, beanPropertyAccessorFactory.accessorFor(bean, "${parentProperty.pathFromRoot}.${property.name}"), markupBuilder)
+    protected void renderDisplay(PersistentEntity domainClass, MarkupBuilder markupBuilder, DomainProperty parentProperty) {
+        renderDisplay(domainClass, markupBuilder) { DomainProperty property ->
+            property.rootProperty = parentProperty
+            renderDisplayField(property, markupBuilder)
         }
     }
 
-    protected void renderDisplayField(def bean, BeanPropertyAccessor property, MarkupBuilder markupBuilder) {
+    protected void renderDisplayField(DomainProperty property, MarkupBuilder markupBuilder) {
         markupBuilder.li(class: 'fieldcontain') {
             span([id: "${property.pathFromRoot}-label", class: "property-label"], getLabelText(property))
             div([class: "property-value", "aria-labelledby": "${property.pathFromRoot}-label"]) {
-                def persistentProperty = property.persistentProperty
-                if (persistentProperty?.association && persistentProperty.embedded) {
-                    renderDisplay(bean, persistentProperty.component, markupBuilder, property)
+                PersistentProperty persistentProperty = property.property
+                if (persistentProperty instanceof Embedded) {
+                    renderDisplay(persistentProperty.associatedEntity, markupBuilder, property)
                 } else {
                     renderPropertyDisplay(property, true, markupBuilder)
                 }
@@ -119,17 +125,17 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
         }
     }
 
-    String renderPropertyDisplay(BeanPropertyAccessor property, Boolean includeControllerName) {
+    String renderPropertyDisplay(DomainProperty property, Boolean includeControllerName) {
         outputMarkupContent { MarkupBuilder markupBuilder ->
             renderPropertyDisplay(property, includeControllerName, markupBuilder)
         }
     }
 
-    protected void renderPropertyDisplay(BeanPropertyAccessor property, Boolean includeControllerName, MarkupBuilder markupBuilder) {
-        def persistentProperty = property.persistentProperty
+    protected void renderPropertyDisplay(DomainProperty property, Boolean includeControllerName, MarkupBuilder markupBuilder) {
+        PersistentProperty persistentProperty = property.property
         Closure propertyDisplay
-        if (persistentProperty?.association) {
-            if (persistentProperty.oneToMany || persistentProperty.manyToMany) {
+        if (persistentProperty instanceof Association) {
+            if (persistentProperty instanceof OneToMany || persistentProperty instanceof ManyToMany) {
                 null
                 //return displayAssociationList(model.value, persistentProperty.referencedDomainClass)
             } else {
@@ -144,8 +150,8 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
         }
     }
 
-    String getLabelText(BeanPropertyAccessor property) {
-        def labelText
+    String getLabelText(DomainProperty property) {
+        String labelText
         if (property.labelKeys) {
             labelText = resolveMessage(property.labelKeys, property.defaultLabel)
         }

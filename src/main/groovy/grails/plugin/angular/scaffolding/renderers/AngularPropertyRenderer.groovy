@@ -1,20 +1,19 @@
 package grails.plugin.angular.scaffolding.renderers
 
-import grails.core.GrailsDomainClass
-import grails.plugin.formfields.BeanPropertyAccessor
-import groovy.xml.MarkupBuilder
+import grails.plugin.angular.scaffolding.model.property.DomainProperty
+import org.grails.datastore.mapping.model.PersistentEntity
 
 interface AngularPropertyRenderer {
 
-    String renderEditEmbedded(def bean, BeanPropertyAccessor property)
+    String renderEditEmbedded(DomainProperty property)
 
-    String renderEdit(BeanPropertyAccessor property)
+    String renderEdit(DomainProperty property)
 
-    String renderDisplay(def bean, GrailsDomainClass domainClass)
+    String renderDisplay(PersistentEntity domainClass)
 
-    String renderPropertyDisplay(BeanPropertyAccessor property, Boolean includeControllerName)
+    String renderPropertyDisplay(DomainProperty property, Boolean includeControllerName)
 
-    String getLabelText(BeanPropertyAccessor property)
+    String getLabelText(DomainProperty property)
 
     String resolveMessage(List<String> keysInPreferenceOrder, String defaultMessage)
 }

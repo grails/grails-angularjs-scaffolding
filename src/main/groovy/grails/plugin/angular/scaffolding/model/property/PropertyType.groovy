@@ -1,4 +1,4 @@
-package grails.plugin.angular.scaffolding.element
+package grails.plugin.angular.scaffolding.model.property
 
 /**
  * Created by Jim on 5/12/2016.

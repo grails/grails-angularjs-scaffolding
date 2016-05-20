@@ -1,36 +1,28 @@
 package grails.angular.scaffolding
 
-import grails.codegen.model.Model
-import grails.codegen.model.ModelBuilder
-import grails.core.GrailsApplication
-import grails.core.GrailsDomainClass
-import grails.core.GrailsDomainClassProperty
 import grails.plugin.angular.scaffolding.command.GrailsApplicationCommand
 import grails.plugin.angular.scaffolding.element.AngularMarkupBuilder
-import grails.plugin.angular.scaffolding.element.PropertyType
+import grails.plugin.angular.scaffolding.model.property.PropertyType
 import grails.plugin.angular.scaffolding.model.AngularModel
 import grails.plugin.angular.scaffolding.model.DomainModelService
+import grails.plugin.angular.scaffolding.model.property.DomainProperty
 import grails.plugin.angular.scaffolding.renderers.AngularModuleEditor
 import grails.plugin.angular.scaffolding.renderers.AngularPropertyRenderer
-import grails.plugin.formfields.BeanPropertyAccessor
-import grails.plugin.formfields.BeanPropertyAccessorFactory
 import groovy.json.JsonOutput
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
-import org.grails.validation.GrailsDomainClassValidator
+import org.grails.datastore.mapping.model.types.Embedded
 import org.springframework.beans.factory.annotation.Value
 
 class NgGenerateAllCommand implements GrailsApplicationCommand {
 
     MappingContext grailsDomainClassMappingContext
-    BeanPropertyAccessorFactory beanPropertyAccessorFactory
     DomainModelService domainModelService
     AngularPropertyRenderer angularPropertyRenderer
     AngularModuleEditor angularModuleEditor
     AngularMarkupBuilder angularMarkupBuilder
 
     private PersistentEntity domainClass
-    private GrailsDomainClass grailsDomainClass
 
     String assetPath
 
@@ -44,31 +36,28 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
     boolean handle() {
         try {
             domainClass = grailsDomainClassMappingContext.getPersistentEntity(args[0])
-            grailsDomainClass = ((GrailsDomainClassValidator) grailsDomainClassMappingContext.getEntityValidator(domainClass)).domainClass
             Object bean = domainClass.newInstance()
 
             List<String> formFields = []
-            Map<GrailsDomainClassProperty, String> listProperties = [:]
+            Map<DomainProperty, String> listProperties = [:]
 
-            List<BeanPropertyAccessor> associatedProperties = []
+            List<DomainProperty> associatedProperties = []
 
-            for (property in domainModelService.getEditableProperties(grailsDomainClass)) {
-                BeanPropertyAccessor propertyAccessor = beanPropertyAccessorFactory.accessorFor(bean, property.name)
-                if (property?.embedded) {
-                    formFields.add(angularPropertyRenderer.renderEditEmbedded(bean, propertyAccessor))
+            for (property in domainModelService.getEditableProperties(domainClass)) {
+                if (property.property instanceof Embedded) {
+                    formFields.add(angularPropertyRenderer.renderEditEmbedded(property))
                 } else {
-                    formFields.add(angularPropertyRenderer.renderEdit(propertyAccessor))
+                    formFields.add(angularPropertyRenderer.renderEdit(property))
                 }
-                if (domainModelService.getPropertyType(propertyAccessor) == PropertyType.ASSOCIATION) {
-                    associatedProperties.add(propertyAccessor)
+                if (domainModelService.getPropertyType(property) == PropertyType.ASSOCIATION) {
+                    associatedProperties.add(property)
                 }
             }
 
-            String showForm = angularPropertyRenderer.renderDisplay(bean, grailsDomainClass)
+            String showForm = angularPropertyRenderer.renderDisplay(domainClass)
 
-            domainModelService.getShortListVisibleProperties(grailsDomainClass).each {
-                BeanPropertyAccessor propertyAccessor = beanPropertyAccessorFactory.accessorFor(bean, it.name)
-                listProperties[it] = angularPropertyRenderer.renderPropertyDisplay(propertyAccessor, false)
+            domainModelService.getShortListVisibleProperties(domainClass).each { DomainProperty property ->
+                listProperties[property] = angularPropertyRenderer.renderPropertyDisplay(property, false)
             }
 
             AngularModel module = model(domainClass.javaClass)
@@ -84,10 +73,10 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                 supportingModule = coreModule
             }
 
-            Boolean hasFileProperty = domainModelService.hasPropertyType(grailsDomainClass, PropertyType.FILE)
-            Boolean hasTimeZoneProperty = domainModelService.hasPropertyType(grailsDomainClass, PropertyType.TIMEZONE)
-            Boolean hasCurrencyProperty = domainModelService.hasPropertyType(grailsDomainClass, PropertyType.CURRENCY)
-            Boolean hasLocaleProperty = domainModelService.hasPropertyType(grailsDomainClass, PropertyType.LOCALE)
+            Boolean hasFileProperty = domainModelService.hasPropertyType(domainClass, PropertyType.FILE)
+            Boolean hasTimeZoneProperty = domainModelService.hasPropertyType(domainClass, PropertyType.TIMEZONE)
+            Boolean hasCurrencyProperty = domainModelService.hasPropertyType(domainClass, PropertyType.CURRENCY)
+            Boolean hasLocaleProperty = domainModelService.hasPropertyType(domainClass, PropertyType.LOCALE)
 
             AngularModel parentModule = module.parentModule
             if (parentModule?.exists()) {
@@ -106,7 +95,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
             Map createEditInjections = [:]
             Map domainInjections = [:]
 
-            associatedProperties.each { BeanPropertyAccessor property ->
+            associatedProperties.each { DomainProperty property ->
                 AngularModel associatedModule = handleAssociatedProperty(property)
                 angularModuleEditor.addDependency(module.file, associatedModule)
                 createEditInjections[associatedModule.className] = "${controllerName}.${associatedModule.propertyName}List = ${associatedModule.className}.list();"
@@ -209,8 +198,8 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         return true
     }
 
-    AngularModel handleAssociatedProperty(BeanPropertyAccessor property) {
-        AngularModel module = model(property.propertyType)
+    AngularModel handleAssociatedProperty(DomainProperty property) {
+        AngularModel module = model(property.type)
 
         //if (!module.exists()) {
             final String controllerName = angularMarkupBuilder.controllerName
@@ -236,7 +225,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                     model: module.asMap() << [dependencies: dependencies, controllerAs: controllerName],
                     overwrite: true
 
-            render template: template("angular/javascripts/${domainModelService.hasPropertyType(property.beanClass, PropertyType.FILE) ? "multipartDomain" : "domain"}.js"),
+            render template: template("angular/javascripts/${domainModelService.hasPropertyType(property.owner, PropertyType.FILE) ? "multipartDomain" : "domain"}.js"),
                     destination: file("${basePath}/${modulePath}/domain/${module.className}.js"),
                     model: module.asMap() << [controllerAs: controllerName, injections: [:]],
                     overwrite: true
