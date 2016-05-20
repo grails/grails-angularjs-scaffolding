@@ -1,50 +1,59 @@
 package grails.plugin.angular.scaffolding.model
 
-import com.sun.java.swing.plaf.windows.TMSchema
 import grails.core.GrailsDomainClass
-import grails.core.GrailsDomainClassProperty
-import grails.plugin.angular.scaffolding.element.PropertyType
-import grails.plugin.angular.scaffolding.model.DomainModelService
-import grails.plugin.angular.scaffolding.model.DomainModelServiceImpl
+import grails.plugin.angular.scaffolding.model.property.PropertyType
+import grails.plugin.angular.scaffolding.model.property.DomainProperty
+import grails.plugin.angular.scaffolding.model.property.DomainPropertyFactory
+import grails.plugin.angular.scaffolding.model.property.DomainPropertyFactoryImpl
 import grails.validation.ConstrainedProperty
 import org.grails.core.DefaultGrailsDomainClass
+import org.grails.datastore.mapping.keyvalue.mapping.config.KeyValueMappingContext
+import org.grails.datastore.mapping.model.MappingContext
+import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.validation.GrailsDomainClassValidator
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
-import java.sql.Time
 
-/**
- * Created by Jim on 5/15/2016.
- */
 class DomainModelServiceSpec extends Specification {
 
     @Shared
     DomainModelService domainModelService
 
+    @Shared
+    PersistentEntity domainClass
+
     void setup() {
         domainModelService = new DomainModelServiceImpl()
+        domainClass = Mock(PersistentEntity) {
+            (0..1) * getJavaClass() >> ScaffoldedDomain
+        }
     }
 
     void "test getEditableProperties valid property"() {
         given:
-        GrailsDomainClass domainClass = Mock {
-            1 * getClazz() >> ScaffoldedDomain
+        PersistentProperty bar = Mock()
+        DomainProperty domainProperty = Mock(DomainProperty) {
+            1 * getConstraints() >> Mock(ConstrainedProperty) { 1 * isDisplay() >> true }
+            1 * getName() >> "bar"
         }
-        GrailsDomainClassProperty bar = Mock {
-            2 * getName() >> "bar"
-            1 * isDerived() >> false
+        domainModelService.domainPropertyFactory = Mock(DomainPropertyFactoryImpl) {
+            1 * build(bar) >> domainProperty
         }
         1 * domainClass.getPersistentProperties() >> [bar]
-        domainClass.getConstrainedProperties() >> ["bar": Mock(ConstrainedProperty) { 1 * isDisplay() >> true }]
 
         when:
-        List<GrailsDomainClassProperty> properties = domainModelService.getEditableProperties(domainClass).toList()
+        List<DomainProperty> properties = domainModelService.getEditableProperties(domainClass).toList()
 
         then: "properties that are excluded in the scaffolded property aren't included"
         properties.size() == 1
-        properties[0] == bar
+        properties[0] == domainProperty
     }
 
+    /*
+    TODO: Wait until derived is added to next version of GORM
     void "test getEditableProperties derived"() {
         given:
         GrailsDomainClass domainClass = Mock {
@@ -63,20 +72,21 @@ class DomainModelServiceSpec extends Specification {
         then: "properties that are excluded in the scaffolded property aren't included"
         properties.empty
     }
+    */
 
     void "test getEditableProperties dateCreated"() {
         given:
-        GrailsDomainClass domainClass = Mock {
-            1 * getClazz() >> ScaffoldedDomain
-        }
-        GrailsDomainClassProperty dateCreated = Mock {
+        PersistentProperty dateCreated = Mock()
+        DomainProperty domainProperty = Mock(DomainProperty) {
             1 * getName() >> "dateCreated"
-            0 * isDerived()
+        }
+        domainModelService.domainPropertyFactory = Mock(DomainPropertyFactoryImpl) {
+            1 * build(dateCreated) >> domainProperty
         }
         1 * domainClass.getPersistentProperties() >> [dateCreated]
 
         when:
-        List<GrailsDomainClassProperty> properties = domainModelService.getEditableProperties(domainClass).toList()
+        List<DomainProperty> properties = domainModelService.getEditableProperties(domainClass).toList()
 
         then: "properties that are excluded in the scaffolded property aren't included"
         properties.empty
@@ -84,17 +94,17 @@ class DomainModelServiceSpec extends Specification {
 
     void "test getEditableProperties lastUpdated"() {
         given:
-        GrailsDomainClass domainClass = Mock {
-            1 * getClazz() >> ScaffoldedDomain
-        }
-        GrailsDomainClassProperty lastUpdated = Mock {
+        PersistentProperty lastUpdated = Mock()
+        DomainProperty domainProperty = Mock(DomainProperty) {
             1 * getName() >> "lastUpdated"
-            0 * isDerived()
+        }
+        domainModelService.domainPropertyFactory = Mock(DomainPropertyFactoryImpl) {
+            1 * build(lastUpdated) >> domainProperty
         }
         1 * domainClass.getPersistentProperties() >> [lastUpdated]
 
         when:
-        List<GrailsDomainClassProperty> properties = domainModelService.getEditableProperties(domainClass).toList()
+        List<DomainProperty> properties = domainModelService.getEditableProperties(domainClass).toList()
 
         then: "properties that are excluded in the scaffolded property aren't included"
         properties.empty
@@ -102,17 +112,18 @@ class DomainModelServiceSpec extends Specification {
 
     void "test getEditableProperties constraints display false"() {
         given:
-        GrailsDomainClass domainClass = Mock {
-            1 * getClazz() >> ScaffoldedDomain
+        PersistentProperty bar = Mock()
+        DomainProperty domainProperty = Mock(DomainProperty) {
+            1 * getName() >> "bar"
+            1 * getConstraints() >> Mock(ConstrainedProperty) { 1 * isDisplay() >> false }
         }
-        GrailsDomainClassProperty bar = Mock {
-            2 * getName() >> "bar"
+        domainModelService.domainPropertyFactory = Mock(DomainPropertyFactoryImpl) {
+            1 * build(bar) >> domainProperty
         }
         1 * domainClass.getPersistentProperties() >> [bar]
-        domainClass.getConstrainedProperties() >> ["bar": Mock(ConstrainedProperty) { 1 * isDisplay() >> false }]
 
         when:
-        List<GrailsDomainClassProperty> properties = domainModelService.getEditableProperties(domainClass).toList()
+        List<DomainProperty> properties = domainModelService.getEditableProperties(domainClass).toList()
 
         then: "properties that are excluded in the scaffolded property aren't included"
         properties.empty
@@ -120,24 +131,42 @@ class DomainModelServiceSpec extends Specification {
 
     void "test getEditableProperties scaffold exclude"() {
         given:
-        GrailsDomainClass domainClass = Mock {
-            1 * getClazz() >> ScaffoldedDomain
-        }
-        GrailsDomainClassProperty foo = Mock {
+        PersistentProperty foo = Mock()
+        DomainProperty domainProperty = Mock(DomainProperty) {
             1 * getName() >> "foo"
+        }
+        domainModelService.domainPropertyFactory = Mock(DomainPropertyFactoryImpl) {
+            1 * build(foo) >> domainProperty
         }
         1 * domainClass.getPersistentProperties() >> [foo]
 
         when:
-        List<GrailsDomainClassProperty> properties = domainModelService.getEditableProperties(domainClass).toList()
+        List<DomainProperty> properties = domainModelService.getEditableProperties(domainClass).toList()
 
         then: "properties that are excluded in the scaffolded property aren't included"
         properties.empty
     }
 
-    void "test hasPropertyType"() {
+    private PersistentEntity mockDomainClass(MappingContext mappingContext, Class clazz) {
+        PersistentEntity persistentEntity = mappingContext.addPersistentEntity(clazz)
+        GrailsDomainClass grailsDomainClass = new DefaultGrailsDomainClass(clazz, [:])
+        mappingContext.addEntityValidator(persistentEntity, new GrailsDomainClassValidator(domainClass: grailsDomainClass))
+        persistentEntity
+    }
+
+    @Unroll
+    void "test hasPropertyType - expect property #propertyType to exist: #expected"() {
+        given:
+        MappingContext mappingContext = new KeyValueMappingContext("test")
+        PersistentEntity persistentEntity = mockDomainClass(mappingContext, ScaffoldedDomain)
+        mockDomainClass(mappingContext, EmbeddedAssociate)
+        DomainPropertyFactory domainPropertyFactory = new DomainPropertyFactoryImpl()
+        domainPropertyFactory.trimStrings = true
+        domainPropertyFactory.convertEmptyStringsToNull = true
+        domainPropertyFactory.grailsDomainClassMappingContext = mappingContext
+        domainModelService.domainPropertyFactory = domainPropertyFactory
         when:
-        Boolean hasType = domainModelService.hasPropertyType(new DefaultGrailsDomainClass(ScaffoldedDomain, [:]), propertyType)
+        Boolean hasType = domainModelService.hasPropertyType(persistentEntity, propertyType)
 
         then:
         hasType == expected
@@ -184,6 +213,8 @@ class DomainModelServiceSpec extends Specification {
     }
 
     class EmbeddedAssociate {
+        Long id
+        Long version
         TimeZone timeZone
         Calendar cal
     }
