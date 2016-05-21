@@ -17,9 +17,17 @@ interface DomainProperty extends PersistentProperty, Comparable<DomainProperty> 
 
     void setRootProperty(PersistentProperty rootProperty)
 
+    PropertyType getPropertyType()
+
+    void setPropertyType(PropertyType propertyType)
+
     Class getRootBeanType()
 
     Class getBeanType()
+
+    Class getAssociatedType()
+
+    PersistentEntity getAssociatedEntity()
 
     boolean isRequired()
 

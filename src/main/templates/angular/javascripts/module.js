@@ -22,7 +22,7 @@ function config(\$stateProvider) {
             controller: "${className}ListController as ${controllerAs}"
         })
         .state('${propertyName}.create', {
-            url: "/create",
+            url: "/create",${createParams}
             templateUrl: "/${modulePath}/create.html",
             controller: "${className}CreateController as ${controllerAs}"
         })

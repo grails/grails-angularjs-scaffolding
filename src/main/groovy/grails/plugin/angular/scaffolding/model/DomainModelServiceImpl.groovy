@@ -7,6 +7,7 @@ import grails.util.GrailsClassUtils
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.model.types.Embedded
 import org.grails.datastore.mapping.model.types.ManyToMany
 import org.grails.datastore.mapping.model.types.ManyToOne
@@ -60,9 +61,10 @@ class DomainModelServiceImpl implements DomainModelService {
 
     List<PersistentProperty> getShortListVisibleProperties(PersistentEntity domainClass) {
         List<PersistentProperty> properties = getVisibleProperties(domainClass)
-        if (properties.size() > 6) {
-            properties = properties[0..6]
+        if (properties.size() > 5) {
+            properties = properties[0..5]
         }
+        properties.add(0, domainPropertyFactory.build(domainClass.identity))
         properties
     }
 
@@ -122,10 +124,6 @@ class DomainModelServiceImpl implements DomainModelService {
             PropertyType.URL
         } else if (isEnum(property.type)) {
             PropertyType.ENUM
-        } else if (property.persistentProperty instanceof OneToOne || property.persistentProperty instanceof ManyToOne || property.persistentProperty instanceof ManyToMany) {
-            PropertyType.ASSOCIATION
-        } else if (property.persistentProperty instanceof OneToMany) {
-            PropertyType.ONETOMANY
         } else if (isDate(property.type)) {
             PropertyType.DATE
         } else if (isTime(property.type)) {
@@ -138,6 +136,18 @@ class DomainModelServiceImpl implements DomainModelService {
             PropertyType.CURRENCY
         } else if (isLocale(property.type)) {
             PropertyType.LOCALE
+        } else {
+            PersistentProperty persistentProperty = property.persistentProperty
+            if (persistentProperty instanceof Association) {
+                if (persistentProperty instanceof OneToOne ||
+                    persistentProperty instanceof ManyToOne ||
+                    persistentProperty instanceof ManyToMany ||
+                    persistentProperty instanceof OneToMany && !persistentProperty.bidirectional) {
+                    PropertyType.ASSOCIATION
+                } else if (persistentProperty instanceof OneToMany) {
+                    PropertyType.ONETOMANY
+                }
+            }
         }
     }
 

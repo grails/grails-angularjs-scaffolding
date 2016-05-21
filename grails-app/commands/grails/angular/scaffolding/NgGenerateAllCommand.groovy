@@ -8,10 +8,15 @@ import grails.plugin.angular.scaffolding.model.DomainModelService
 import grails.plugin.angular.scaffolding.model.property.DomainProperty
 import grails.plugin.angular.scaffolding.renderers.AngularModuleEditor
 import grails.plugin.angular.scaffolding.renderers.AngularPropertyRenderer
+import grails.plugin.angular.scaffolding.templates.AngularDomainHelper
+import grails.plugin.angular.scaffolding.templates.CreateControllerHelper
 import groovy.json.JsonOutput
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.types.Embedded
+import org.grails.datastore.mapping.model.types.ManyToOne
+import org.grails.datastore.mapping.model.types.ToMany
+import org.grails.datastore.mapping.model.types.ToOne
 import org.springframework.beans.factory.annotation.Value
 
 class NgGenerateAllCommand implements GrailsApplicationCommand {
@@ -36,7 +41,6 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
     boolean handle() {
         try {
             domainClass = grailsDomainClassMappingContext.getPersistentEntity(args[0])
-            Object bean = domainClass.newInstance()
 
             List<String> formFields = []
             Map<DomainProperty, String> listProperties = [:]
@@ -49,7 +53,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                 } else {
                     formFields.add(angularPropertyRenderer.renderEdit(property))
                 }
-                if (domainModelService.getPropertyType(property) == PropertyType.ASSOCIATION) {
+                if ([PropertyType.ASSOCIATION, PropertyType.ONETOMANY].contains(domainModelService.getPropertyType(property))) {
                     associatedProperties.add(property)
                 }
             }
@@ -87,19 +91,19 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
             String controllerName = angularMarkupBuilder.controllerName
 
+            CreateControllerHelper createControllerHelper = new CreateControllerHelper(associatedProperties)
+
             render template: template('angular/javascripts/module.js'),
                     destination: module.file,
-                    model: module.asMap() << [dependencies: dependencies, controllerAs: controllerName],
+                    model: module.asMap() << [dependencies: dependencies, controllerAs: controllerName, createParams: createControllerHelper.stateParams],
                     overwrite: true
 
             Map createEditInjections = [:]
-            Map domainInjections = [:]
 
             associatedProperties.each { DomainProperty property ->
                 AngularModel associatedModule = handleAssociatedProperty(property)
                 angularModuleEditor.addDependency(module.file, associatedModule)
                 createEditInjections[associatedModule.className] = "${controllerName}.${associatedModule.propertyName}List = ${associatedModule.className}.list();"
-                domainInjections[associatedModule.className] = associatedModule.propertyName
             }
 
             final String modulePath = module.modulePath
@@ -163,9 +167,28 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                         overwrite: true
             }
 
+            if (associatedProperties) {
+                if (associatedProperties.any { it.persistentProperty instanceof ToMany}) {
+                    render template: template("angular/javascripts/services/domainToManyConversion.js"),
+                            destination: file("${basePath}/${supportingModule.modulePath}/services/domainToManyConversion.js"),
+                            model: [moduleName: supportingModule.moduleName],
+                            overwrite: true
+                }
+
+                render template: template("angular/javascripts/services/domainListConversion.js"),
+                        destination: file("${basePath}/${supportingModule.modulePath}/services/domainListConversion.js"),
+                        model: [moduleName: supportingModule.moduleName],
+                        overwrite: true
+
+                render template: template("angular/javascripts/services/domainConversion.js"),
+                        destination: file("${basePath}/${supportingModule.modulePath}/services/domainConversion.js"),
+                        model: [moduleName: supportingModule.moduleName],
+                        overwrite: true
+            }
+
             render template: template('angular/javascripts/controllers/createController.js'),
                    destination: file("${basePath}/${modulePath}/controllers/${module.propertyName}CreateController.js"),
-                   model: artefactParams << [injections: createEditInjections],
+                   model: artefactParams << [injections: createEditInjections, createParams: createControllerHelper.controllerStatements],
                    overwrite: true
 
             render template: template('angular/javascripts/controllers/editController.js'),
@@ -183,9 +206,11 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                    model: artefactParams,
                    overwrite: true
 
+            AngularDomainHelper angularModuleHelper = new AngularDomainHelper(associatedProperties)
+
             render template: template("angular/javascripts/${hasFileProperty ? "multipartDomain" : "domain"}.js"),
                    destination: file("${basePath}/${modulePath}/domain/${module.className}.js"),
-                   model: artefactParams << [injections: domainInjections],
+                   model: artefactParams << [injections: angularModuleHelper.moduleConfig, getConfig: angularModuleHelper.getConfig, queryConfig: angularModuleHelper.queryConfig],
                    overwrite: true
 
 
@@ -199,7 +224,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
     }
 
     AngularModel handleAssociatedProperty(DomainProperty property) {
-        AngularModel module = model(property.type)
+        AngularModel module = model(property.associatedType)
 
         //if (!module.exists()) {
             final String controllerName = angularMarkupBuilder.controllerName
@@ -223,12 +248,12 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
             render template: template('angular/javascripts/associatedModule.js'),
                     destination: module.file,
                     model: module.asMap() << [dependencies: dependencies, controllerAs: controllerName],
-                    overwrite: true
+                    overwrite: false
 
             render template: template("angular/javascripts/${domainModelService.hasPropertyType(property.owner, PropertyType.FILE) ? "multipartDomain" : "domain"}.js"),
                     destination: file("${basePath}/${modulePath}/domain/${module.className}.js"),
-                    model: module.asMap() << [controllerAs: controllerName, injections: [:]],
-                    overwrite: true
+                    model: module.asMap() << [controllerAs: controllerName, injections: '', getConfig: '', queryConfig: ''],
+                    overwrite: false
        // }
 
         module

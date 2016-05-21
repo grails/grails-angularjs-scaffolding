@@ -18,7 +18,7 @@ function ${className}EditController(${className}, \$stateParams, \$state<%= inje
     ${controllerAs}.update${className} = function() {
         ${controllerAs}.errors = undefined;
         ${controllerAs}.${propertyName}.\$update(function() {
-            \$state.go('${propertyName}.list');
+            \$state.go('${propertyName}.show', {id: ${controllerAs}.${propertyName}.id});
         }, function(response) {
             var data = response.data;
             if (data.hasOwnProperty('message')) {

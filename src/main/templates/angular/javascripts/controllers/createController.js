@@ -4,12 +4,16 @@ angular
     .module("${moduleName}")
     .controller("${className}CreateController", ${className}CreateController);
 
-function ${className}CreateController(${className}, \$state<%= injections ? ', ' + injections.keySet().join(', ') : '' %>) {
+function ${className}CreateController(${className}, \$state<%= createParams ? ', \$stateParams' : '' %><%= injections ? ', ' + injections.keySet().join(', ') : '' %>) {
 
     var ${controllerAs} = this;
-    <%= injections ? injections.values().join('\n') : '' %>
+    <%= injections ? injections.values().join('\n    ') : '' %>
     ${controllerAs}.${propertyName} = new ${className}();
-
+    <% createParams.each { %>
+    if (\$stateParams.${it.parameterName}) {
+        ${controllerAs}.${propertyName}.${it.propertyName} = {id: \$stateParams.${it.parameterName}};
+    }
+    <% } %>
     ${controllerAs}.save${className} = function() {
         ${controllerAs}.errors = undefined;
         ${controllerAs}.${propertyName}.\$save({}, function() {

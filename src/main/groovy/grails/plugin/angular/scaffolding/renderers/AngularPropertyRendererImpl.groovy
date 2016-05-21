@@ -132,18 +132,7 @@ class AngularPropertyRendererImpl implements AngularPropertyRenderer {
     }
 
     protected void renderPropertyDisplay(DomainProperty property, Boolean includeControllerName, MarkupBuilder markupBuilder) {
-        PersistentProperty persistentProperty = property.persistentProperty
-        Closure propertyDisplay
-        if (persistentProperty instanceof Association) {
-            if (persistentProperty instanceof OneToMany || persistentProperty instanceof ManyToMany) {
-                null
-                //return displayAssociationList(model.value, persistentProperty.referencedDomainClass)
-            } else {
-                propertyDisplay = angularMarkupBuilder.renderAssociationDisplay(property, includeControllerName)
-            }
-        } else {
-            propertyDisplay = angularMarkupBuilder.renderPropertyDisplay(property, includeControllerName)
-        }
+        Closure propertyDisplay = angularMarkupBuilder.renderPropertyDisplay(property, includeControllerName)
         if (propertyDisplay) {
             propertyDisplay.delegate = markupBuilder
             propertyDisplay.call()

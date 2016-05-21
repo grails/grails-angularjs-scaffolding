@@ -6,6 +6,7 @@ import grails.validation.Constrained
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.Association
 import org.grails.validation.GrailsDomainClassValidator
 
 import static grails.validation.ConstrainedProperty.BLANK_CONSTRAINT
@@ -19,6 +20,7 @@ class DomainPropertyImpl implements DomainProperty {
     PersistentEntity domainClass
     Constrained constraints
     String pathFromRoot
+    PropertyType propertyType
 
     protected Boolean convertEmptyStringsToNull
     protected Boolean trimStrings
@@ -47,6 +49,14 @@ class DomainPropertyImpl implements DomainProperty {
 
     Class getBeanType() {
         owner.javaClass
+    }
+
+    Class getAssociatedType() {
+        associatedEntity.javaClass
+    }
+
+    PersistentEntity getAssociatedEntity() {
+        ((Association)persistentProperty).associatedEntity
     }
 
     boolean isRequired() {

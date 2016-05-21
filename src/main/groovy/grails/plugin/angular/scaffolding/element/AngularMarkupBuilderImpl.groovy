@@ -6,7 +6,13 @@ import grails.plugin.angular.scaffolding.model.property.PropertyType
 import grails.util.GrailsNameUtils
 import grails.validation.Constrained
 import groovy.json.JsonOutput
+import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.model.types.ManyToMany
+import org.grails.datastore.mapping.model.types.OneToMany
+import org.grails.datastore.mapping.model.types.ToMany
+import org.grails.datastore.mapping.model.types.ToOne
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 
@@ -45,16 +51,40 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
     }
 
     Closure renderPropertyDisplay(DomainProperty property, Boolean includeControllerName) {
+        if (property.persistentProperty instanceof ToOne) {
+            renderAssociationDisplay(property, includeControllerName)
+        } else if (property.persistentProperty instanceof ToMany) {
+            renderOneToManyDisplay(property, includeControllerName)
+        } else {
+            { ->
+                span("{{${buildPropertyPath(property, includeControllerName)}}}")
+            }
+        }
+    }
+
+    protected Closure renderAssociationDisplay(String propertyPath, String propertyName) {
         return { ->
-            span("{{${buildPropertyPath(property, includeControllerName)}}}")
+            a("{{${propertyPath}.toString()}}", ["ui-sref": "${propertyName}.show({id: ${propertyPath}.id})"])
         }
     }
 
     Closure renderAssociationDisplay(DomainProperty property, Boolean includeControllerName) {
         final String propertyPath = buildPropertyPath(property, includeControllerName)
         final String propertyName = GrailsNameUtils.getPropertyName(property.type)
+        renderAssociationDisplay(propertyPath, propertyName)
+    }
+
+    Closure renderOneToManyDisplay(DomainProperty property, Boolean includeControllerName) {
+        final String propertyPath = buildPropertyPath(property, includeControllerName)
+        final String propertyName = GrailsNameUtils.getPropertyName(property.associatedType)
         return { ->
-            a("{{${propertyPath}.toString()}}", ["ui-sref": "${propertyName}.show({id: ${propertyPath}.id})"])
+            ul(['ng-repeat': "${propertyName} in ${propertyPath}"]) {
+                li() {
+                    Closure link = renderAssociationDisplay(propertyName, propertyName)
+                    link.delegate = delegate
+                    link.call()
+                }
+            }
         }
     }
 
@@ -80,8 +110,7 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
                 renderAssociation(property)
                 break
             case PropertyType.ONETOMANY:
-                // TODO case oneToMany
-                { -> }
+                renderOneToMany(property)
                 break
             case PropertyType.DATE:
                 renderDate(property)
@@ -219,15 +248,26 @@ class AngularMarkupBuilderImpl implements AngularMarkupBuilder {
 
     Closure renderAssociation(DomainProperty property) {
         Map attributes = getStandardAttributes(property)
-        final String name = attributes.name
-        attributes['ng-options'] = "${name} as $name for $name in ${controllerName}.${name}List track by ${name}.id"
+        final String name = GrailsNameUtils.getPropertyName(property.associatedType)
+        attributes['ng-options'] = "$name for $name in ${controllerName}.${name}List track by ${name}.id"
 
-        if (property.persistentProperty instanceof ManyToMany) {
+        PersistentProperty persistentProperty = property.persistentProperty
+        if (persistentProperty instanceof ManyToMany || (persistentProperty instanceof OneToMany && !persistentProperty.bidirectional) ) {
             attributes["multiple"] = ""
         }
 
         return { ->
             select('', attributes)
+        }
+    }
+
+    Closure renderOneToMany(DomainProperty property) {
+        final String stateName = GrailsNameUtils.getPropertyName(property.associatedType)
+        final String objectName = "${controllerName}.${GrailsNameUtils.getPropertyName(property.rootBeanType)}.id"
+        final String className = property.associatedType.simpleName
+        final String otherPropertyName = ((Association)property.persistentProperty).inverseSide.name
+        return { ->
+            a("Add ${className}", ["ui-sref": "${stateName}.create({${otherPropertyName}Id: ${objectName}})"])
         }
     }
 

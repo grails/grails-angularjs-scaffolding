@@ -1,5 +1,6 @@
 package grails.plugin.angular.scaffolding.model.property
 
+import grails.plugin.angular.scaffolding.model.DomainModelService
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,6 +20,9 @@ class DomainPropertyFactoryImpl implements DomainPropertyFactory {
     @Autowired
     MappingContext grailsDomainClassMappingContext
 
+    @Autowired
+    DomainModelService domainModelService
+
     DomainProperty build(PersistentProperty persistentProperty) {
         DomainPropertyImpl domainProperty = new DomainPropertyImpl(persistentProperty, grailsDomainClassMappingContext)
         init(domainProperty)
@@ -34,5 +38,6 @@ class DomainPropertyFactoryImpl implements DomainPropertyFactory {
     private init(DomainPropertyImpl domainProperty) {
         domainProperty.convertEmptyStringsToNull = convertEmptyStringsToNull
         domainProperty.trimStrings = trimStrings
+        domainProperty.propertyType = domainModelService.getPropertyType(domainProperty)
     }
 }
