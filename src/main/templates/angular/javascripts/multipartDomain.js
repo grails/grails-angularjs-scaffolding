@@ -14,7 +14,7 @@ function ${className}(\$resource, dateFilter${injections}) {
          "query": {method: "GET", isArray: true${queryConfig}},
          "get": {method: 'GET'${getConfig}}}
     );
-
+    
     ${className}.list = ${className}.query;
 
     ${className}.prototype.toString = function() {

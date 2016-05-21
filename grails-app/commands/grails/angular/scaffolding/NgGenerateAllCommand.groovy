@@ -53,7 +53,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                 } else {
                     formFields.add(angularPropertyRenderer.renderEdit(property))
                 }
-                if ([PropertyType.ASSOCIATION, PropertyType.ONETOMANY].contains(domainModelService.getPropertyType(property))) {
+                if ([PropertyType.ASSOCIATION, PropertyType.ONETOMANY].contains(property.propertyType)) {
                     associatedProperties.add(property)
                 }
             }
