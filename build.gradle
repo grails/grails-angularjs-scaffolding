@@ -45,16 +45,11 @@ task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
 }
 grailsPublish {
-    // TODO: Provide values here
-    user = 'user'
-    key = 'key'
-    githubSlug = 'foo/bar'
+    githubSlug = 'grails-plugins/grails-angular-scaffolding'
     license {
         name = 'Apache-2.0'
     }
-    title = "My Plugin"
-    desc = "Full plugin description"
-    developers = [johndoe:"John Doe"]
-    portalUser = ""
-    portalPassword = ""    
+    title = "AngularJS Scaffolding Plugin"
+    desc = "Provides scaffolding for AngularJS 1.x applications"
+    developers = [jameskleeh:"James Kleeh"]
 }
