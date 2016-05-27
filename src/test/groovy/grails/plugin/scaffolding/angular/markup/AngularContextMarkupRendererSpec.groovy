@@ -6,9 +6,7 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import spock.lang.Shared
 import spock.lang.Specification
 
-/**
- * Created by Jim on 5/26/2016.
- */
+
 class AngularContextMarkupRendererSpec extends Specification {
 
     @Shared
