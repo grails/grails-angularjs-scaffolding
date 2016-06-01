@@ -11,6 +11,7 @@ import grails.plugin.scaffolding.angular.template.AngularDomainHelper
 import grails.plugin.scaffolding.angular.template.CreateControllerHelper
 import grails.plugin.scaffolding.registry.input.FileInputRenderer
 import grails.web.mapping.LinkGenerator
+import grails.web.mapping.UrlMappings
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.types.Association
@@ -23,7 +24,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
     DomainModelService domainModelService
     DomainMarkupRenderer domainMarkupRenderer
     AngularModuleEditor angularModuleEditor
-    //LinkGenerator grailsLinkGenerator
+    UrlMappings grailsUrlMappingsHolder
     AngularPropertyMarkupRenderer propertyMarkupRenderer
 
     private PersistentEntity domainClass
@@ -35,6 +36,9 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         this.assetPath = assetPath
         this.basePath = "grails-app/assets/${assetPath}"
     }
+
+    @Value('${grails.codegen.angular.uiRouterPath:/angular/angular-ui-router}')
+    String uiRouterPath
 
     @Override
     boolean handle() {
@@ -53,7 +57,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
             AngularModel supportingModule = module
 
-            Map dependencies = ['"ui.router"': '/angular/angular-ui-router']
+            Map dependencies = ['"ui.router"': uiRouterPath]
 
             AngularModel coreModule = model("${module.packageName}.Core")
 
@@ -164,11 +168,11 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                    model: artefactParams,
                    overwrite: true
 
-            AngularDomainHelper angularDomainHelper = new AngularDomainHelper(associatedProperties)
+            AngularDomainHelper angularDomainHelper = new AngularDomainHelper(domainClass, associatedProperties, grailsUrlMappingsHolder)
 
             render template: template("angular/javascripts/${hasFileProperty ? "multipartDomain" : "domain"}.js"),
                    destination: file("${basePath}/${modulePath}/domain/${module.className}.js"),
-                   model: artefactParams << [injections: angularDomainHelper.moduleConfig, getConfig: angularDomainHelper.getConfig, queryConfig: angularDomainHelper.queryConfig],
+                   model: artefactParams << [injections: angularDomainHelper.moduleConfig, getConfig: angularDomainHelper.getConfig, queryConfig: angularDomainHelper.queryConfig, uri: angularDomainHelper.uri],
                    overwrite: true
 
 
@@ -212,9 +216,11 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
             fileInputRenderer.supports(domainProperty)
         }
 
+        AngularDomainHelper angularDomainHelper = new AngularDomainHelper(domainClass, [], grailsUrlMappingsHolder)
+
         render template: template("angular/javascripts/${hasFileProperty ? "multipartDomain" : "domain"}.js"),
                 destination: file("${basePath}/${modulePath}/domain/${module.className}.js"),
-                model: module.asMap() << [controllerAs: controllerName, injections: '', getConfig: '', queryConfig: ''],
+                model: module.asMap() << [controllerAs: controllerName, injections: '', getConfig: '', queryConfig: '', uri: angularDomainHelper.uri],
                 overwrite: false
 
         module

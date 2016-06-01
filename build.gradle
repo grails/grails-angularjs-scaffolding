@@ -34,8 +34,6 @@ dependencies {
     provided "org.springframework.boot:spring-boot-autoconfigure"
     provided "org.springframework.boot:spring-boot-starter-tomcat"
     provided "org.grails:grails-dependencies"
-    provided "javax.servlet:javax.servlet-api:3.1.0"
-    compile 'org.grails.plugins:fields:2.1.2'
     compile "jline:jline:2.12"
     profile "org.grails.profiles:plugin:3.2.0.BUILD-SNAPSHOT"
     testCompile "org.grails:grails-plugin-testing"

@@ -15,6 +15,10 @@ abstract class DomainRendererRegistry<T extends DomainRenderer> {
 
     abstract T getDefaultRenderer()
 
+    public SortedSet<Entry> getDomainRegistryEntries() {
+        this.domainRegistryEntries
+    }
+
     T get(DomainProperty domainProperty) {
         for (Entry entry : domainRegistryEntries) {
             if (entry.renderer.supports(domainProperty)) {

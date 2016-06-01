@@ -6,7 +6,7 @@ angular
 
 function ${className}(\$resource${injections}) {
     var ${className} = \$resource(
-        "${propertyName}/:id",
+        "${uri}/:id",
         {"id": "@id"},
         {"update": {method: "PUT"},
          "query": {method: "GET", isArray: true${queryConfig}},

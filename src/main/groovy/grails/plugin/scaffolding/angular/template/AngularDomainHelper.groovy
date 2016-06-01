@@ -1,6 +1,10 @@
 package grails.plugin.scaffolding.angular.template
 
 import grails.plugin.scaffolding.model.property.DomainProperty
+import grails.util.GrailsNameUtils
+import grails.web.mapping.UrlMappings
+import grails.web.mapping.exceptions.UrlMappingException
+import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.types.ToMany
 
 class AngularDomainHelper {
@@ -9,11 +13,22 @@ class AngularDomainHelper {
     final String getConfig
     final String queryConfig
     final String moduleConfig
+    final String uri
 
-    AngularDomainHelper(List<DomainProperty> associatedProperties) {
+    AngularDomainHelper(PersistentEntity domain, List<DomainProperty> associatedProperties, UrlMappings urlMappings) {
         this.associations = associatedProperties.collect { DomainProperty property ->
             new AngularDomainAssociation(property.associatedType.simpleName, property)
         }
+        String uri
+        try {
+            uri = urlMappings
+                    .getReverseMapping(domain.decapitalizedName, "index", null, null, "GET", Collections.emptyMap())
+                    .createURL(Collections.emptyMap(), 'UTF8')
+                    .replaceFirst('/', '')
+        } catch (UrlMappingException e) {
+            uri = domain.decapitalizedName
+        }
+        this.uri = uri
 
         List getTransforms = []
         List queryTransforms = []
