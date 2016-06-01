@@ -8,7 +8,7 @@ buildscript {
     }
 }
 
-version "1.0.0.M1"
+version "1.0.0.BUILD-SNAPSHOT"
 group "org.grails.plugins"
 
 apply plugin:"eclipse"
@@ -43,6 +43,7 @@ task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
 }
 grailsPublish {
+    userOrg = "grails"
     githubSlug = 'grails-plugins/grails-angular-scaffolding'
     license {
         name = 'Apache-2.0'
