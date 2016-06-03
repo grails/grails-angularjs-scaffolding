@@ -19,6 +19,32 @@ class ContextMarkupRendererImpl implements ContextMarkupRenderer {
         property.defaultLabel
     }
 
+    protected String getLabelText(DomainProperty property) {
+        String labelText
+        if (property.labelKeys) {
+            labelText = resolveMessage(property.labelKeys, property.defaultLabel)
+        }
+        if (!labelText) {
+            labelText = property.defaultLabel
+        }
+        labelText
+    }
+
+    protected String resolveMessage(List<String> keysInPreferenceOrder, String defaultMessage) {
+        def message = keysInPreferenceOrder.findResult { key ->
+            messageSource.getMessage(key, [].toArray(), defaultMessage, Locale.default) ?: null
+        }
+        message ?: defaultMessage
+    }
+
+    protected String toPropertyNameFormat(Class type) {
+        String propertyNameFormat = GrailsNameUtils.getLogicalPropertyName(type.canonicalName, '')
+        if (propertyNameFormat.endsWith('[]')) {
+            propertyNameFormat = propertyNameFormat - '[]' + 'Array'
+        }
+        propertyNameFormat
+    }
+
     @Override
     Closure listOutputContext(PersistentEntity domainClass, List<DomainProperty> properties, Closure content) {
         { ->
@@ -91,39 +117,13 @@ class ContextMarkupRendererImpl implements ContextMarkupRenderer {
 
     @Override
     Closure embeddedInputContext(DomainProperty property, Closure content) {
-        String legendText = resolveMessage(property.labelKeys, property.defaultLabel)
         return { ->
             content.delegate = delegate
             fieldset(class: "embedded ${toPropertyNameFormat(property.type)}") {
-                legend(legendText)
+                legend(getLabelText(property))
                 content.call()
             }
         }
     }
 
-    String getLabelText(DomainProperty property) {
-        String labelText
-        if (property.labelKeys) {
-            labelText = resolveMessage(property.labelKeys, property.defaultLabel)
-        }
-        if (!labelText) {
-            labelText = property.defaultLabel
-        }
-        labelText
-    }
-
-    String resolveMessage(List<String> keysInPreferenceOrder, String defaultMessage) {
-        def message = keysInPreferenceOrder.findResult { key ->
-            messageSource.getMessage(key, [].toArray(), defaultMessage, Locale.default) ?: null
-        }
-        message ?: defaultMessage
-    }
-
-    String toPropertyNameFormat(Class type) {
-        String propertyNameFormat = GrailsNameUtils.getLogicalPropertyName(type.canonicalName, '')
-        if (propertyNameFormat.endsWith('[]')) {
-            propertyNameFormat = propertyNameFormat - '[]' + 'Array'
-        }
-        propertyNameFormat
-    }
 }

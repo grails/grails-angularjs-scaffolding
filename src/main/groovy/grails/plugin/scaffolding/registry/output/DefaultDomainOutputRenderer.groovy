@@ -29,7 +29,7 @@ class DefaultDomainOutputRenderer implements DomainOutputRenderer {
     @Override
     Closure renderOutput(DomainProperty property) {
         { ->
-            "\${${buildPropertyPath(property)}}"
+            span("\${${buildPropertyPath(property)}}")
         }
     }
 }
