@@ -1,11 +1,11 @@
 package grails.plugin.scaffolding.registry.input
 
+import grails.plugin.scaffolding.model.property.DomainProperty
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Subject
 
-/**
- * Created by Jim on 5/26/2016.
- */
+@Subject(LocaleInputRenderer)
 class LocaleInputRendererSpec extends Specification {
 
     @Shared
@@ -13,6 +13,19 @@ class LocaleInputRendererSpec extends Specification {
 
     void setup() {
         renderer = new LocaleInputRenderer()
+    }
+
+    void "test supports"() {
+        given:
+        DomainProperty property
+
+        when:
+        property = Mock(DomainProperty) {
+            1 * getType() >> Locale
+        }
+
+        then:
+        renderer.supports(property)
     }
 
     void "test option key and value"() {

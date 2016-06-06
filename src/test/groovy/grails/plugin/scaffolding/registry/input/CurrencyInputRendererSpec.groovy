@@ -1,18 +1,19 @@
 package grails.plugin.scaffolding.registry.input
 
+import grails.plugin.scaffolding.ClosureCaptureSpecification
 import grails.plugin.scaffolding.model.property.DomainProperty
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Subject
 
-@Subject(TimeZoneInputRenderer)
-class TimeZoneInputRendererSpec extends Specification {
+@Subject(CurrencyInputRenderer)
+class CurrencyInputRendererSpec extends Specification {
 
     @Shared
-    TimeZoneInputRenderer renderer
+    CurrencyInputRenderer renderer
 
     void setup() {
-        renderer = new TimeZoneInputRenderer()
+        renderer = new CurrencyInputRenderer()
     }
 
     void "test supports"() {
@@ -21,7 +22,7 @@ class TimeZoneInputRendererSpec extends Specification {
 
         when:
         property = Mock(DomainProperty) {
-            1 * getType() >> TimeZone
+            1 * getType() >> Currency
         }
 
         then:
@@ -30,10 +31,10 @@ class TimeZoneInputRendererSpec extends Specification {
 
     void "test option key and value"() {
         given:
-        TimeZone timeZone = TimeZone.getTimeZone("America/New_York")
+        Currency currency = Currency.getInstance("USD")
 
         expect:
-        renderer.getOptionKey(timeZone) == "America/New_York"
-        renderer.getOptionValue(timeZone) == "EDT, Eastern Daylight Time -5:0.0 [America/New_York]"
+        renderer.getOptionKey(currency) == "USD"
+        renderer.getOptionValue(currency) == "USD"
     }
 }

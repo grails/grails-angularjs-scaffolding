@@ -45,6 +45,10 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         try {
             domainClass = grailsDomainClassMappingContext.getPersistentEntity(args[0])
 
+            if (!domainClass) {
+                error("The domain class you entered ${args[0]} could not be found")
+            }
+
             String formTemplate = domainMarkupRenderer.renderForm(domainClass)
             String showTemplate = domainMarkupRenderer.renderOutput(domainClass)
             String listTemplate = domainMarkupRenderer.renderListOutput(domainClass)

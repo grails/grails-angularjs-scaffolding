@@ -11,16 +11,18 @@ class NumberInputRenderer implements DomainInputRenderer {
 
     @Override
     boolean supports(DomainProperty domainProperty) {
-        domainProperty.type.isPrimitive() || domainProperty.type in Number
+        Class type = domainProperty.type
+        type.isPrimitive() || type in Number
     }
 
     @Override
     Closure renderInput(Map attributes, DomainProperty property) {
         Constrained constraints = property.constraints
-        if (constraints?.range) {
+        Range range = constraints?.range
+        if (range) {
             attributes.type = "range"
-            attributes.min = constraints.range.from
-            attributes.max = constraints.range.to
+            attributes.min = range.from
+            attributes.max = range.to
         } else {
             String typeName = property.type.simpleName.toLowerCase()
 
@@ -39,7 +41,6 @@ class NumberInputRenderer implements DomainInputRenderer {
                 attributes.max = constraints.max
             }
         }
-
 
         return { ->
             input(attributes)

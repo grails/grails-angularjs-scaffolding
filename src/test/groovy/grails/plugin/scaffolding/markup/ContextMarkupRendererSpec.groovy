@@ -1,6 +1,7 @@
 package grails.plugin.scaffolding.markup
 
 import grails.plugin.scaffolding.ClosureCapture
+import grails.plugin.scaffolding.ClosureCaptureSpecification
 import grails.plugin.scaffolding.model.property.DomainProperty
 import org.grails.datastore.mapping.model.PersistentEntity
 import spock.lang.Shared
@@ -9,21 +10,13 @@ import spock.lang.Specification
 /**
  * Created by Jim on 6/2/2016.
  */
-class ContextMarkupRendererSpec extends Specification {
+class ContextMarkupRendererSpec extends ClosureCaptureSpecification {
 
     @Shared
     ContextMarkupRendererImpl renderer
 
     void setup() {
         renderer = new ContextMarkupRendererImpl()
-    }
-
-    private ClosureCapture getClosureCapture(Closure closure) {
-        ClosureCapture closureCapture = new ClosureCapture()
-        closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure.delegate = closureCapture
-        closure.call()
-        closureCapture
     }
 
     void "test listOutputContext"() {

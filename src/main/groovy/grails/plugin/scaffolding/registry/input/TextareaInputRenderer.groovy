@@ -15,8 +15,9 @@ class TextareaInputRenderer implements DomainInputRenderer {
 
     @Override
     Closure renderInput(Map defaultAttributes, DomainProperty domainProperty) {
-        if (domainProperty.constraints?.maxSize) {
-            defaultAttributes.maxlength = domainProperty.constraints.maxSize
+        Integer maxSize = domainProperty.constraints?.maxSize
+        if (maxSize) {
+            defaultAttributes.maxlength = maxSize
         }
         return { ->
             textarea(defaultAttributes)
