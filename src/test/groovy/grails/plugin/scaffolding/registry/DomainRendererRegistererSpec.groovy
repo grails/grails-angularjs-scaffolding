@@ -6,7 +6,7 @@ import grails.plugin.scaffolding.registry.input.BidirectionalToManyInputRenderer
 import grails.plugin.scaffolding.registry.input.BooleanInputRenderer
 import grails.plugin.scaffolding.registry.input.CurrencyInputRenderer
 import grails.plugin.scaffolding.registry.input.DateInputRenderer
-import grails.plugin.scaffolding.registry.input.DefaultDomainInputRenderer
+import grails.plugin.scaffolding.registry.input.DefaultInputRenderer
 import grails.plugin.scaffolding.registry.input.EnumInputRenderer
 import grails.plugin.scaffolding.registry.input.FileInputRenderer
 import grails.plugin.scaffolding.registry.input.InListInputRenderer
@@ -203,7 +203,7 @@ class DomainRendererRegistererSpec extends Specification {
         }
 
         expect:
-        domainInputRendererRegistry.get(domainProperty) instanceof DefaultDomainInputRenderer
+        domainInputRendererRegistry.get(domainProperty) instanceof DefaultInputRenderer
     }
 
     void "test the BiDirectionalToMany renderer is returned"() {

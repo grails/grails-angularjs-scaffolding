@@ -62,6 +62,7 @@ class DomainPropertyImpl implements DomainProperty {
         if (type in [Boolean, boolean]) {
             false
         } else if (type == String) {
+            Constrained constraints = getConstraints()
             // if the property prohibits nulls and blanks are converted to nulls, then blanks will be prohibited even if a blank
             // constraint does not exist
             boolean hasBlankConstraint = constraints?.hasAppliedConstraint(BLANK_CONSTRAINT)

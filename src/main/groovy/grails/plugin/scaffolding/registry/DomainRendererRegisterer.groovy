@@ -1,7 +1,7 @@
 package grails.plugin.scaffolding.registry
 
 import grails.plugin.scaffolding.registry.input.*
-import grails.plugin.scaffolding.registry.output.DefaultDomainOutputRenderer
+import grails.plugin.scaffolding.registry.output.DefaultOutputRenderer
 import grails.web.mapping.LinkGenerator
 import org.springframework.beans.factory.annotation.Autowired
 import javax.annotation.PostConstruct
@@ -20,6 +20,7 @@ class DomainRendererRegisterer {
 
     @PostConstruct
     void registerRenderers() {
+        domainInputRendererRegistry.registerDomainRenderer(new DefaultInputRenderer(), -3)
         domainInputRendererRegistry.registerDomainRenderer(new UrlInputRenderer(), -1)
         domainInputRendererRegistry.registerDomainRenderer(new TimeZoneInputRenderer(), -1)
         domainInputRendererRegistry.registerDomainRenderer(new TimeInputRenderer(), -1)
@@ -30,13 +31,12 @@ class DomainRendererRegisterer {
         domainInputRendererRegistry.registerDomainRenderer(new InListInputRenderer(), -1)
         domainInputRendererRegistry.registerDomainRenderer(new FileInputRenderer(), -1)
         domainInputRendererRegistry.registerDomainRenderer(new EnumInputRenderer(), -1)
-        domainInputRendererRegistry.registerDomainRenderer(new DefaultDomainInputRenderer(), -3)
         domainInputRendererRegistry.registerDomainRenderer(new DateInputRenderer(), -1)
         domainInputRendererRegistry.registerDomainRenderer(new CurrencyInputRenderer(), -1)
         domainInputRendererRegistry.registerDomainRenderer(new BooleanInputRenderer(), -1)
         domainInputRendererRegistry.registerDomainRenderer(new BidirectionalToManyInputRenderer(grailsLinkGenerator), -1)
         domainInputRendererRegistry.registerDomainRenderer(new AssociationInputRenderer(), -2)
 
-        domainOutputRendererRegistry.registerDomainRenderer(new DefaultDomainOutputRenderer(), -1)
+        domainOutputRendererRegistry.registerDomainRenderer(new DefaultOutputRenderer(), -1)
     }
 }

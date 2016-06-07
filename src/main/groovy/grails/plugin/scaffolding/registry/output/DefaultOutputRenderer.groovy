@@ -7,7 +7,7 @@ import grails.util.GrailsNameUtils
 /**
  * Created by Jim on 5/24/2016.
  */
-class DefaultDomainOutputRenderer implements DomainOutputRenderer {
+class DefaultOutputRenderer implements DomainOutputRenderer {
 
     protected String buildPropertyPath(DomainProperty property) {
         StringBuilder sb = new StringBuilder()
@@ -18,7 +18,7 @@ class DefaultDomainOutputRenderer implements DomainOutputRenderer {
 
     @Override
     boolean supports(DomainProperty property) {
-        return false
+        true
     }
 
     @Override

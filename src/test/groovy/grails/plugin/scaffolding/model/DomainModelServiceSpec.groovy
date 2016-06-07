@@ -68,39 +68,31 @@ class DomainModelServiceSpec extends Specification implements MocksDomain {
     }
     */
 
-    void "test getEditableProperties dateCreated"() {
+    void "test getEditableProperties excluded by default"() {
         given:
-        PersistentProperty dateCreated = Mock()
-        DomainProperty domainProperty = Mock(DomainProperty) {
+        PersistentProperty persistentProperty1 = Mock(PersistentProperty)
+        PersistentProperty persistentProperty2 = Mock(PersistentProperty)
+        PersistentProperty persistentProperty3 = Mock(PersistentProperty)
+        DomainProperty dateCreated = Mock(DomainProperty) {
             1 * getName() >> "dateCreated"
         }
-        domainModelService.domainPropertyFactory = Mock(DomainPropertyFactoryImpl) {
-            1 * build(dateCreated) >> domainProperty
+        DomainProperty lastUpdated = Mock(DomainProperty) {
+            1 * getName() >> "lastUpdated"
         }
-        1 * domainClass.getPersistentProperties() >> [dateCreated]
-
-        when:
-        List<DomainProperty> properties = domainModelService.getEditableProperties(domainClass).toList()
-
-        then: "properties that are excluded in the scaffolded property aren't included"
-        properties.empty
-    }
-
-    void "test getEditableProperties lastUpdated"() {
-        given:
-        PersistentProperty lastUpdated = Mock()
-        DomainProperty domainProperty = Mock(DomainProperty) {
+        DomainProperty version = Mock(DomainProperty) {
             1 * getName() >> "lastUpdated"
         }
         domainModelService.domainPropertyFactory = Mock(DomainPropertyFactoryImpl) {
-            1 * build(lastUpdated) >> domainProperty
+            1 * build(persistentProperty1) >> dateCreated
+            1 * build(persistentProperty2) >> lastUpdated
+            1 * build(persistentProperty3) >> version
         }
-        1 * domainClass.getPersistentProperties() >> [lastUpdated]
+        1 * domainClass.getPersistentProperties() >> [persistentProperty1, persistentProperty2, persistentProperty3]
 
         when:
         List<DomainProperty> properties = domainModelService.getEditableProperties(domainClass).toList()
 
-        then: "properties that are excluded in the scaffolded property aren't included"
+        then: "properties that are excluded by default are excluded"
         properties.empty
     }
 
@@ -159,6 +151,62 @@ class DomainModelServiceSpec extends Specification implements MocksDomain {
         !domainModelService.hasProperty(persistentEntity) { DomainProperty p ->
             p.name == "not here"
         }
+    }
+
+    void "test getVisibleProperties"() {
+        given:
+        PersistentProperty persistentProperty1 = Mock(PersistentProperty)
+        PersistentProperty persistentProperty2 = Mock(PersistentProperty)
+        DomainProperty foo = Stub(DomainProperty) {
+            getName() >> "foo"
+        }
+        DomainProperty version = Stub(DomainProperty) {
+            getName() >> "version"
+        }
+        domainModelService.domainPropertyFactory = Mock(DomainPropertyFactoryImpl) {
+            1 * build(persistentProperty1) >> foo
+            1 * build(persistentProperty2) >> version
+        }
+        1 * domainClass.getPersistentProperties() >> [persistentProperty1, persistentProperty2]
+
+        when:
+        List<DomainProperty> properties = domainModelService.getVisibleProperties(domainClass).toList()
+
+        then: "version is excluded"
+        properties.size() == 1
+        properties[0].name == "foo"
+    }
+
+    void "test getShortListVisibleProperties"() {
+        given:
+        List persistentProperties = (1..10).collect {
+            Mock(PersistentProperty)
+        }
+        List domainProperties = (1..10).collect { num ->
+            Stub(DomainProperty) {
+                getName() >> num.toString()
+            }
+        }
+        domainProperties.add(Stub(DomainProperty) {
+            getName() >> "version"
+        })
+        PersistentProperty identity = Stub(PersistentProperty)
+        domainModelService.domainPropertyFactory = Mock(DomainPropertyFactoryImpl) {
+            10 * build(_ as PersistentProperty) >>> domainProperties
+            1 * build(identity) >> Stub(DomainProperty) {
+                getName() >> "id"
+            }
+        }
+        1 * domainClass.getPersistentProperties() >> persistentProperties
+        1 * domainClass.getIdentity() >> identity
+
+        when:
+        List<DomainProperty> properties = domainModelService.getShortListVisibleProperties(domainClass).toList()
+
+        then: "Identity is added to the beginning list after trimmed to 6. Version is excluded"
+        properties.size() == 7
+        properties[0].name == "id"
+        properties[6].name == "6"
     }
 
     class ScaffoldedDomain {

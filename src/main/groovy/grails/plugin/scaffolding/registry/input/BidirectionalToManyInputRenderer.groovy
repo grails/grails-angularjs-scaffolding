@@ -32,7 +32,7 @@ class BidirectionalToManyInputRenderer implements DomainInputRenderer {
 
     @Override
     Closure renderInput(Map defaultAttributes, DomainProperty property) {
-        final String objectName = "${GrailsNameUtils.getPropertyName(property.rootBeanType)}.id"
+        final String objectName = "${getPropertyName(property)}.id"
         defaultAttributes.remove('required')
         defaultAttributes.remove('readonly')
         defaultAttributes.href = linkGenerator.link(resource: property.associatedType, action: "create", params: [(objectName): ""])

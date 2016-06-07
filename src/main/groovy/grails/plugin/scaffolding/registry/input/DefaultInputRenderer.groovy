@@ -3,11 +3,11 @@ package grails.plugin.scaffolding.registry.input
 import grails.plugin.scaffolding.model.property.DomainProperty
 import grails.plugin.scaffolding.registry.DomainInputRenderer
 
-class DefaultDomainInputRenderer implements DomainInputRenderer {
+class DefaultInputRenderer implements DomainInputRenderer {
 
     @Override
     boolean supports(DomainProperty property) {
-        false
+        true
     }
 
     @Override
