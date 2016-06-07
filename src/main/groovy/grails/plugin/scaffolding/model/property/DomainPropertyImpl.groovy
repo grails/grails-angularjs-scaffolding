@@ -7,6 +7,7 @@ import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
+import org.grails.datastore.mapping.model.types.Basic
 import org.grails.validation.GrailsDomainClassValidator
 
 import static grails.validation.ConstrainedProperty.BLANK_CONSTRAINT
@@ -27,14 +28,16 @@ class DomainPropertyImpl implements DomainProperty {
     DomainPropertyImpl(PersistentProperty persistentProperty, MappingContext mappingContext) {
         this.persistentProperty = persistentProperty
         this.domainClass = persistentProperty.owner
-        this.grailsDomainClass = ((GrailsDomainClassValidator) mappingContext.getEntityValidator(domainClass)).domainClass
-        this.constraints = (Constrained)grailsDomainClass.constrainedProperties[name]
+        this.grailsDomainClass = ((GrailsDomainClassValidator)mappingContext.getEntityValidator(domainClass))?.domainClass
+        if (this.grailsDomainClass) {
+            this.constraints = (Constrained)grailsDomainClass.constrainedProperties[name]
+        }
         this.pathFromRoot = persistentProperty.name
     }
 
     DomainPropertyImpl(PersistentProperty rootProperty, PersistentProperty persistentProperty, MappingContext mappingContext) {
         this(persistentProperty, mappingContext)
-        this.rootProperty = rootProperty
+        this.setRootProperty(rootProperty)
     }
 
     void setRootProperty(PersistentProperty rootProperty) {
@@ -51,7 +54,15 @@ class DomainPropertyImpl implements DomainProperty {
     }
 
     Class getAssociatedType() {
-        associatedEntity.javaClass
+        if (persistentProperty instanceof Association) {
+            if (persistentProperty.basic) {
+                ((Basic)persistentProperty).componentType
+            } else {
+                associatedEntity.javaClass
+            }
+        } else {
+            null
+        }
     }
 
     PersistentEntity getAssociatedEntity() {

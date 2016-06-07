@@ -58,7 +58,7 @@ class DomainMarkupRendererImpl implements DomainMarkupRenderer {
         )
     }
 
-    String renderForm(PersistentEntity domainClass) {
+    String renderInput(PersistentEntity domainClass) {
         outputMarkupContent(
             contextMarkupRenderer.inputContext(domainClass) { ->
                 def contextDelegate = delegate

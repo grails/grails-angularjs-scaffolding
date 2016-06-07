@@ -101,7 +101,7 @@ class DomainMarkupRendererSpec extends Specification {
         }
 
         when:
-        String output = renderer.renderForm(domain)
+        String output = renderer.renderInput(domain)
 
         then:
         output == "<form>\n  <div>\n    <span>prop1</span>\n  </div>\n  <fieldset>\n    <div>\n      <span>prop3</span>\n    </div>\n  </fieldset>\n</form>"

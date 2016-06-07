@@ -6,7 +6,7 @@ import grails.plugin.scaffolding.registry.DomainInputRenderer
 /**
  * Created by Jim on 5/25/2016.
  */
-class LocaleInputRenderer implements DomainInputRenderer, MapToSelectInputRenderer<Locale> {
+class LocaleInputRenderer implements MapToSelectInputRenderer<Locale> {
 
     String getOptionValue(Locale locale) {
         locale.country ? "${locale.language}, ${locale.country},  ${locale.displayName}" : "${locale.language}, ${locale.displayName}"

@@ -3,10 +3,18 @@ package grails.plugin.scaffolding.markup
 import grails.plugin.scaffolding.model.property.DomainProperty
 
 /**
- * Created by Jim on 5/14/2016.
+ * Used to render markup that represents a single domain class property
+ *
+ * @author James Kleeh
  */
 trait PropertyMarkupRenderer {
 
+    /**
+     * Builds the standard html attributes that will be passed to {@link grails.plugin.scaffolding.registry.DomainInputRenderer#renderInput}
+     *
+     * @param property The domain property to be rendered
+     * @return A map of the standard attributes
+     */
     Map getStandardAttributes(DomainProperty property) {
         final String name = property.pathFromRoot
         Map attributes = [:]
@@ -21,9 +29,27 @@ trait PropertyMarkupRenderer {
         attributes
     }
 
+    /**
+     * Defines how a given domain class property will be rendered in the context of a list of domains class instances
+     *
+     * @param property The domain property to be rendered
+     * @return The closure to be passed to an instance of {@link groovy.xml.MarkupBuilder}
+     */
     abstract Closure renderListOutput(DomainProperty property)
 
+    /**
+     * Defines how a given domain class property will be rendered in the context of a single domains class instance
+     *
+     * @param property The domain property to be rendered
+     * @return The closure to be passed to an instance of {@link groovy.xml.MarkupBuilder}
+     */
     abstract Closure renderOutput(DomainProperty property)
 
+    /**
+     * Defines how a given domain class property will be rendered in the context of a form
+     *
+     * @param property The domain property to be rendered
+     * @return The closure to be passed to an instance of {@link groovy.xml.MarkupBuilder}
+     */
     abstract Closure renderInput(DomainProperty property)
 }

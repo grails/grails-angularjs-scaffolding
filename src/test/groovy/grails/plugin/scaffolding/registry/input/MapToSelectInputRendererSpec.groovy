@@ -3,6 +3,7 @@ package grails.plugin.scaffolding.registry.input
 import grails.plugin.scaffolding.ClosureCapture
 import grails.plugin.scaffolding.ClosureCaptureSpecification
 import grails.plugin.scaffolding.model.property.DomainProperty
+import grails.plugin.scaffolding.registry.DomainInputRenderer
 import spock.lang.Shared
 import spock.lang.Subject
 
@@ -58,6 +59,11 @@ class MapToSelectInputRendererSpec extends ClosureCaptureSpecification {
         @Override
         Map<String, String> getOptions() {
             ["a": "A", "b": "B", "cat": "Cat"]
+        }
+
+        @Override
+        boolean supports(DomainProperty property) {
+            false
         }
     }
 

@@ -10,7 +10,6 @@ import grails.plugin.scaffolding.markup.DomainMarkupRenderer
 import grails.plugin.scaffolding.angular.template.AngularDomainHelper
 import grails.plugin.scaffolding.angular.template.CreateControllerHelper
 import grails.plugin.scaffolding.registry.input.FileInputRenderer
-import grails.web.mapping.LinkGenerator
 import grails.web.mapping.UrlMappings
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
@@ -52,7 +51,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
             return
         }
 
-        String formTemplate = domainMarkupRenderer.renderForm(domainClass)
+        String formTemplate = domainMarkupRenderer.renderInput(domainClass)
         String showTemplate = domainMarkupRenderer.renderOutput(domainClass)
         String listTemplate = domainMarkupRenderer.renderListOutput(domainClass)
 

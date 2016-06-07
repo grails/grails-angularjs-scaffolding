@@ -22,7 +22,7 @@ class DomainModelServiceSpec extends Specification implements MocksDomain {
     void setup() {
         domainModelService = new DomainModelServiceImpl()
         domainClass = Mock(PersistentEntity) {
-            (0..1) * getJavaClass() >> ScaffoldedDomain
+            getJavaClass() >> ScaffoldedDomain
         }
     }
 

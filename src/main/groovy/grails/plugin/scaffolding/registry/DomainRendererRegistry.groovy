@@ -3,6 +3,11 @@ package grails.plugin.scaffolding.registry
 import grails.plugin.scaffolding.model.property.DomainProperty
 import java.util.concurrent.atomic.AtomicInteger
 
+/**
+ * A registry of domain property renderers sorted by priority and order of addition
+ *
+ * @author James Kleeh
+ */
 abstract class DomainRendererRegistry<T extends DomainRenderer> {
 
     protected SortedSet<Entry> domainRegistryEntries = new TreeSet<Entry>();

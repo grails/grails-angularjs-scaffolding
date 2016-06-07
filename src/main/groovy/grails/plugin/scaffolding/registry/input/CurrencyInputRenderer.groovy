@@ -6,7 +6,7 @@ import grails.plugin.scaffolding.registry.DomainInputRenderer
 /**
  * Created by Jim on 5/24/2016.
  */
-class CurrencyInputRenderer implements DomainInputRenderer, MapToSelectInputRenderer<Currency> {
+class CurrencyInputRenderer implements MapToSelectInputRenderer<Currency> {
 
     String getOptionValue(Currency currency) {
         currency.currencyCode

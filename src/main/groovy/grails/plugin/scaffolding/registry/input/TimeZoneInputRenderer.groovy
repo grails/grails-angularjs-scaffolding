@@ -6,7 +6,7 @@ import grails.plugin.scaffolding.registry.DomainInputRenderer
 /**
  * Created by Jim on 5/24/2016.
  */
-class TimeZoneInputRenderer implements DomainInputRenderer, MapToSelectInputRenderer<TimeZone> {
+class TimeZoneInputRenderer implements MapToSelectInputRenderer<TimeZone> {
 
     String getOptionValue(TimeZone timeZone) {
         Date date = new Date()
