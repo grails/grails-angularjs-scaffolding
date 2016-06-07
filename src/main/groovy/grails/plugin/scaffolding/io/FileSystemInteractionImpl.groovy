@@ -15,7 +15,6 @@
  */
 package grails.plugin.scaffolding.io
 
-import grails.build.logging.GrailsConsole
 import grails.util.BuildSettings
 import groovy.transform.CompileStatic
 import org.grails.io.support.*
@@ -133,7 +132,7 @@ class FileSystemInteractionImpl implements FileSystemInteraction {
                 to = new File(to, from.filename)
             }
             SpringIOUtils.copy(from, to)
-            GrailsConsole.instance.addStatus("Copied ${from.filename} to location ${to.canonicalPath}")
+            println("Copied ${from.filename} to location ${to.canonicalPath}")
         }
         return this
     }

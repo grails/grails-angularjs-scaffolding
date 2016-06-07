@@ -19,12 +19,10 @@ import org.grails.io.support.ResourceLoader
  */
 class TemplateRendererImpl implements TemplateRenderer {
 
-    ConsoleLogger console
     @Delegate FileSystemInteraction fileSystemInteraction
     protected Map<String, Template> templateCache = [:]
 
-    TemplateRendererImpl(File baseDir, ConsoleLogger console, ResourceLoader resourceLoader = new DefaultResourceLoader()) {
-        this.console = console
+    TemplateRendererImpl(File baseDir, ResourceLoader resourceLoader = new DefaultResourceLoader()) {
         this.fileSystemInteraction = new FileSystemInteractionImpl(baseDir, resourceLoader)
     }
 
@@ -66,7 +64,7 @@ class TemplateRendererImpl implements TemplateRenderer {
     void render(CharSequence template, File destination, Map model = Collections.emptyMap(), boolean overwrite = false) {
         if (template && destination) {
             if (destination.exists() && !overwrite) {
-                console.warn("Destination file ${projectPath(destination)} already exists, skipping...")
+                println("Warning | Destination file ${projectPath(destination)} already exists, skipping...")
             } else {
                 def templateEngine = new GStringTemplateEngine()
                 try {
@@ -100,7 +98,7 @@ class TemplateRendererImpl implements TemplateRenderer {
     void render(File template, File destination, Map model = Collections.emptyMap(), boolean overwrite = false) {
         if (template && destination) {
             if (destination.exists() && !overwrite) {
-                console.warn("Destination file ${projectPath(destination)} already exists, skipping...")
+                println("Warning | Destination file ${projectPath(destination)} already exists, skipping...")
             } else {
                 Template t = templateCache[template.absolutePath]
                 if (t == null) {
@@ -113,7 +111,7 @@ class TemplateRendererImpl implements TemplateRenderer {
                 }
                 try {
                     writeTemplateToDestination(t, model, destination)
-                    console.addStatus("Rendered template ${template.name} to destination ${projectPath(destination)}")
+                    println("Rendered template ${template.name} to destination ${projectPath(destination)}")
                 } catch (Throwable e) {
                     destination.delete()
                     throw new TemplateException("Error rendering template [$template] to destination ${projectPath(destination)}: ${e.message}", e)
@@ -142,7 +140,7 @@ class TemplateRendererImpl implements TemplateRenderer {
     void render(Resource template, File destination, Map model = Collections.emptyMap(), boolean overwrite = false) {
         if (template && destination) {
             if (destination.exists() && !overwrite) {
-                console.warn("Destination file ${projectPath(destination)} already exists, skipping...")
+                println("Warning | Destination file ${projectPath(destination)} already exists, skipping...")
             } else if (!template?.exists()) {
                 throw new TemplateException("Template [$template.filename] not found.")
             } else {
@@ -168,7 +166,7 @@ class TemplateRendererImpl implements TemplateRenderer {
                 if (t != null) {
                     try {
                         writeTemplateToDestination(t, model, destination)
-                        console.addStatus("Rendered template ${template.filename} to destination ${projectPath(destination)}")
+                        println("Rendered template ${template.filename} to destination ${projectPath(destination)}")
                     } catch (Throwable e) {
                         destination.delete()
                         throw new TemplateException("Error rendering template [$template.filename] to destination ${projectPath(destination)}: ${e.message}", e)
