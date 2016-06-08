@@ -68,7 +68,27 @@ class DomainModelServiceImpl implements DomainModelService {
         properties
     }
 
-    Boolean hasProperty(PersistentEntity domainClass, Closure closure) {
+    List<DomainProperty> findProperties(List<DomainProperty> propertyList, Closure closure) {
+        List<DomainProperty> properties = []
+        propertyList.each { DomainProperty domainProperty ->
+            PersistentProperty property = domainProperty.persistentProperty
+            if (property instanceof Embedded) {
+                getEditableProperties(property.associatedEntity).each { DomainProperty embedded ->
+                    embedded.rootProperty = domainProperty
+                    if (closure.call(embedded)) {
+                        properties.add(embedded)
+                    }
+                }
+            } else {
+                if (closure.call(domainProperty)) {
+                    properties.add(domainProperty)
+                }
+            }
+        }
+        properties
+    }
+
+    Boolean hasEditableProperty(PersistentEntity domainClass, Closure closure) {
         findEditableProperties(domainClass, closure).size() > 0
     }
 

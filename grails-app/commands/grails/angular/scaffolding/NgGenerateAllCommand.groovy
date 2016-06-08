@@ -73,7 +73,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         }
 
         FileInputRenderer fileInputRenderer = new FileInputRenderer()
-        Boolean hasFileProperty = domainModelService.hasProperty(domainClass) { DomainProperty property ->
+        Boolean hasFileProperty = domainModelService.hasEditableProperty(domainClass) { DomainProperty property ->
             fileInputRenderer.supports(property)
         }
 
@@ -212,7 +212,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                 overwrite: false
 
         FileInputRenderer fileInputRenderer = new FileInputRenderer()
-        Boolean hasFileProperty = domainModelService.hasProperty(property.associatedEntity) { DomainProperty domainProperty ->
+        Boolean hasFileProperty = domainModelService.hasEditableProperty(property.associatedEntity) { DomainProperty domainProperty ->
             fileInputRenderer.supports(domainProperty)
         }
 

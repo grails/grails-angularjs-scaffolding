@@ -142,13 +142,13 @@ class DomainModelServiceSpec extends Specification implements MocksDomain {
         domainModelService.domainPropertyFactory = domainPropertyFactory
 
         expect:
-        domainModelService.hasProperty(persistentEntity) { DomainProperty p ->
+        domainModelService.hasEditableProperty(persistentEntity) { DomainProperty p ->
             p.name == "timeZone"
         }
-        domainModelService.hasProperty(persistentEntity) { DomainProperty p ->
+        domainModelService.hasEditableProperty(persistentEntity) { DomainProperty p ->
             p.name == "locale"
         }
-        !domainModelService.hasProperty(persistentEntity) { DomainProperty p ->
+        !domainModelService.hasEditableProperty(persistentEntity) { DomainProperty p ->
             p.name == "not here"
         }
     }

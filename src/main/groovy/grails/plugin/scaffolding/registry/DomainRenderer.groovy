@@ -3,7 +3,7 @@ package grails.plugin.scaffolding.registry
 import grails.plugin.scaffolding.model.property.DomainProperty
 
 /**
- * A class used to render markup for a domain class property
+ * Used to render markup for a domain class property
  *
  * @author James Kleeh
  */
