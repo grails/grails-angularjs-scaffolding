@@ -8,6 +8,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'org.asciidoctor.convert' version '1.5.3'
+}
+
 version "1.0.0.BUILD-SNAPSHOT"
 group "org.grails.plugins"
 
@@ -28,6 +32,10 @@ dependencyManagement {
     applyMavenExclusions false
 }
 
+configurations {
+    documentation
+}
+
 dependencies {
     provided 'org.springframework.boot:spring-boot-starter-logging'
     provided "org.springframework.boot:spring-boot-starter-actuator"
@@ -37,6 +45,7 @@ dependencies {
     compile "org.grails:scaffolding-core:1.0.0-SNAPSHOT"
     profile "org.grails.profiles:plugin:3.2.0.BUILD-SNAPSHOT"
     testCompile "org.grails:grails-plugin-testing"
+    documentation "org.codehaus.groovy:groovy-all:2.4.6"
 }
 
 task wrapper(type: Wrapper) {
@@ -50,5 +59,35 @@ grailsPublish {
     }
     title = "AngularJS Scaffolding Plugin"
     desc = "Provides scaffolding for AngularJS 1.x applications"
-    developers = [jameskleeh:"James Kleeh"]
+    developers = [jameskleeh: "James Kleeh"]
+}
+
+asciidoctor {
+    resources {
+        from('src/docs/images')
+        into "./images"
+    }
+
+    attributes 'experimental'  : 'true',
+            'compat-mode'   : 'true',
+            'toc'           : 'left',
+            'icons'         : 'font',
+            'version'       : project.version,
+            'sourcedir'     : "${projectDir}/src/main/groovy"
+}
+
+task apidocs(type: Groovydoc) {
+    source project.files('src/main/groovy')
+
+    destinationDir = new File(buildDir, 'docs/api')
+    // Might need a classpath
+    docTitle = "Grails Angular Scaffolding ${version}"
+
+    classpath = configurations.documentation
+    groovyClasspath = configurations.documentation
+}
+
+task docs(type:Copy, dependsOn:[apidocs, asciidoctor])  {
+    from "$buildDir/asciidoc/html5"
+    into "$buildDir/docs"
 }
