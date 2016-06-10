@@ -1,7 +1,6 @@
 package grails.plugin.scaffolding.angular.template
 
-import grails.plugin.scaffolding.model.property.DomainProperty
-import grails.util.GrailsNameUtils
+import org.grails.scaffolding.model.property.DomainProperty
 import grails.web.mapping.UrlMappings
 import grails.web.mapping.exceptions.UrlMappingException
 import org.grails.datastore.mapping.model.PersistentEntity

@@ -1,9 +1,9 @@
 package grails.plugin.scaffolding.angular.registry.input
 
-import grails.plugin.scaffolding.model.property.DomainProperty
-import grails.plugin.scaffolding.registry.input.BidirectionalToManyInputRenderer
 import grails.util.GrailsNameUtils
 import org.grails.datastore.mapping.model.types.Association
+import org.grails.scaffolding.model.property.DomainProperty
+import org.grails.scaffolding.registry.input.BidirectionalToManyInputRenderer
 
 /**
  * Created by Jim on 5/25/2016.

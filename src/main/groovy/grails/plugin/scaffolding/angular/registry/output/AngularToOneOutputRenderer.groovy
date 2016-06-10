@@ -1,7 +1,6 @@
 package grails.plugin.scaffolding.angular.registry.output
 
-import grails.plugin.scaffolding.model.property.DomainProperty
-import grails.plugin.scaffolding.registry.DomainOutputRenderer
+import org.grails.scaffolding.model.property.DomainProperty
 import grails.util.GrailsNameUtils
 import org.grails.datastore.mapping.model.types.ToOne
 

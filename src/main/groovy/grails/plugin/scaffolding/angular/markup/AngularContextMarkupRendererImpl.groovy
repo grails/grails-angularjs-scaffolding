@@ -1,8 +1,8 @@
 package grails.plugin.scaffolding.angular.markup
 
-import grails.plugin.scaffolding.markup.ContextMarkupRendererImpl
-import grails.plugin.scaffolding.model.property.DomainProperty
 import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.scaffolding.markup.ContextMarkupRendererImpl
+import org.grails.scaffolding.model.property.DomainProperty
 import org.springframework.beans.factory.annotation.Autowired
 
 /**

@@ -1,6 +1,6 @@
 package grails.plugin.scaffolding.angular.template
 
-import grails.plugin.scaffolding.model.property.DomainProperty
+import org.grails.scaffolding.model.property.DomainProperty
 import groovy.json.JsonOutput
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.types.ManyToOne

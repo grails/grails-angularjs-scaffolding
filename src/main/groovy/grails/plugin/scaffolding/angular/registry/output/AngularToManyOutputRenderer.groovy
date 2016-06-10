@@ -1,6 +1,6 @@
 package grails.plugin.scaffolding.angular.registry.output
 
-import grails.plugin.scaffolding.model.property.DomainProperty
+import org.grails.scaffolding.model.property.DomainProperty
 import grails.util.GrailsNameUtils
 import org.grails.datastore.mapping.model.types.ToMany
 

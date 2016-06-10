@@ -1,7 +1,7 @@
 package grails.plugin.scaffolding.angular.registry.input
 
-import grails.plugin.scaffolding.model.property.DomainProperty
-import grails.plugin.scaffolding.registry.input.FileInputRenderer
+import org.grails.scaffolding.model.property.DomainProperty
+import org.grails.scaffolding.registry.input.FileInputRenderer
 
 /**
  * Created by Jim on 5/24/2016.

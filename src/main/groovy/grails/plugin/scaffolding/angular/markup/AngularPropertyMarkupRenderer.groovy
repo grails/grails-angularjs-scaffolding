@@ -1,6 +1,6 @@
 package grails.plugin.scaffolding.angular.markup
 
-import grails.plugin.scaffolding.markup.PropertyMarkupRenderer
+import org.grails.scaffolding.markup.PropertyMarkupRenderer
 
 /**
  * Created by Jim on 5/26/2016.

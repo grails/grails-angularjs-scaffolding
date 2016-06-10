@@ -5,13 +5,15 @@ import grails.plugin.scaffolding.angular.markup.AngularContextMarkupRendererImpl
 import grails.plugin.scaffolding.angular.markup.AngularPropertyMarkupRendererImpl
 import grails.plugin.scaffolding.angular.registry.AngularDomainRendererRegisterer
 import grails.plugin.scaffolding.model.DomainModelServiceImpl
-import grails.plugin.scaffolding.model.property.DomainPropertyFactoryImpl
+import org.grails.scaffolding.model.property.DomainPropertyFactoryImpl
 import grails.plugin.scaffolding.angular.template.AngularModuleEditorImpl
 import grails.plugin.scaffolding.markup.DomainMarkupRendererImpl
 import grails.plugin.scaffolding.registry.DomainInputRendererRegistry
 import grails.plugin.scaffolding.registry.DomainOutputRendererRegistry
 import grails.plugin.scaffolding.registry.DomainRendererRegisterer
 import grails.plugins.*
+import org.grails.scaffolding.ScaffoldingBeanConfiguration
+import org.grails.scaffolding.model.DomainModelServiceImpl
 
 class GrailsAngularScaffoldingGrailsPlugin extends Plugin {
 
@@ -51,17 +53,7 @@ Brief summary/description of the plugin.
 //    def scm = [ url: "http://svn.codehaus.org/grails-plugins/" ]
 
     Closure doWithSpring() { {->
-        domainModelService(DomainModelServiceImpl)
-
-        domainOutputRendererRegistry(DomainOutputRendererRegistry)
-
-        domainInputRendererRegistry(DomainInputRendererRegistry)
-
-        domainPropertyFactory(DomainPropertyFactoryImpl)
-
-        domainMarkupRenderer(DomainMarkupRendererImpl)
-
-        domainRendererRegisterer(DomainRendererRegisterer)
+        scaffoldingCoreConfig(ScaffoldingBeanConfiguration)
 
         propertyMarkupRenderer(AngularPropertyMarkupRendererImpl)
 

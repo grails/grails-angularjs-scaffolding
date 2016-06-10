@@ -3,18 +3,18 @@ package grails.angular.scaffolding
 import grails.plugin.scaffolding.angular.markup.AngularPropertyMarkupRenderer
 import grails.plugin.scaffolding.command.GrailsApplicationCommand
 import grails.plugin.scaffolding.angular.model.AngularModel
-import grails.plugin.scaffolding.model.DomainModelService
-import grails.plugin.scaffolding.model.property.DomainProperty
+import org.grails.scaffolding.markup.DomainMarkupRenderer
+import org.grails.scaffolding.model.DomainModelService
+import org.grails.scaffolding.model.property.DomainProperty
 import grails.plugin.scaffolding.angular.template.AngularModuleEditor
-import grails.plugin.scaffolding.markup.DomainMarkupRenderer
 import grails.plugin.scaffolding.angular.template.AngularDomainHelper
 import grails.plugin.scaffolding.angular.template.CreateControllerHelper
-import grails.plugin.scaffolding.registry.input.FileInputRenderer
 import grails.web.mapping.UrlMappings
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.model.types.ToMany
+import org.grails.scaffolding.registry.input.FileInputRenderer
 import org.springframework.beans.factory.annotation.Value
 
 class NgGenerateAllCommand implements GrailsApplicationCommand {

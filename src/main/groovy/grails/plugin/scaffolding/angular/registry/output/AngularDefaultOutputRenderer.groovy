@@ -1,6 +1,6 @@
 package grails.plugin.scaffolding.angular.registry.output
 
-import grails.plugin.scaffolding.model.property.DomainProperty
+import org.grails.scaffolding.model.property.DomainProperty
 
 /**
  * Created by Jim on 5/25/2016.

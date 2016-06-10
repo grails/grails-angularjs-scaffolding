@@ -1,6 +1,6 @@
 package grails.plugin.scaffolding.angular.markup
 
-import grails.plugin.scaffolding.model.property.DomainProperty
+import org.grails.scaffolding.model.property.DomainProperty
 import spock.lang.Shared
 import spock.lang.Specification
 

@@ -11,8 +11,8 @@ import grails.plugin.scaffolding.angular.registry.output.AngularDefaultOutputRen
 import grails.plugin.scaffolding.angular.registry.output.AngularIdOutputRenderer
 import grails.plugin.scaffolding.angular.registry.output.AngularToManyOutputRenderer
 import grails.plugin.scaffolding.angular.registry.output.AngularToOneOutputRenderer
-import grails.plugin.scaffolding.registry.DomainInputRendererRegistry
-import grails.plugin.scaffolding.registry.DomainOutputRendererRegistry
+import org.grails.scaffolding.registry.DomainInputRendererRegistry
+import org.grails.scaffolding.registry.DomainOutputRendererRegistry
 import org.springframework.beans.factory.annotation.Autowired
 import javax.annotation.PostConstruct
 import javax.annotation.Resource

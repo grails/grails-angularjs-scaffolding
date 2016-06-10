@@ -1,8 +1,8 @@
 package grails.plugin.scaffolding.angular.registry.output
 
-import grails.plugin.scaffolding.model.property.DomainProperty
-import grails.plugin.scaffolding.registry.DomainOutputRenderer
+import org.grails.scaffolding.model.property.DomainProperty
 import grails.util.GrailsNameUtils
+import org.grails.scaffolding.registry.DomainOutputRenderer
 
 /**
  * Created by Jim on 5/25/2016.

@@ -1,8 +1,8 @@
 package grails.plugin.scaffolding.angular.markup
 
-import grails.plugin.scaffolding.markup.PropertyMarkupRendererImpl
-import grails.plugin.scaffolding.model.property.DomainProperty
 import grails.util.GrailsNameUtils
+import org.grails.scaffolding.markup.PropertyMarkupRendererImpl
+import org.grails.scaffolding.model.property.DomainProperty
 import org.springframework.beans.factory.annotation.Value
 
 class AngularPropertyMarkupRendererImpl extends PropertyMarkupRendererImpl implements AngularPropertyMarkupRenderer {

@@ -1,7 +1,7 @@
 package grails.plugin.scaffolding.angular.markup
 
 import grails.plugin.scaffolding.ClosureCapture
-import grails.plugin.scaffolding.model.property.DomainProperty
+import org.grails.scaffolding.model.property.DomainProperty
 import org.grails.datastore.mapping.model.PersistentEntity
 import spock.lang.Shared
 import spock.lang.Specification
