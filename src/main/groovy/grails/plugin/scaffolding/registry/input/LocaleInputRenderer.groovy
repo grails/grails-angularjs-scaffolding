@@ -2,10 +2,14 @@ package grails.plugin.scaffolding.registry.input
 
 import grails.plugin.scaffolding.model.property.DomainProperty
 import grails.plugin.scaffolding.registry.DomainInputRenderer
+import groovy.transform.CompileStatic
 
 /**
- * Created by Jim on 5/25/2016.
+ * The default renderer for rendering {@link Locale} properties
+ *
+ * @author James Kleeh
  */
+@CompileStatic
 class LocaleInputRenderer implements MapToSelectInputRenderer<Locale> {
 
     String getOptionValue(Locale locale) {

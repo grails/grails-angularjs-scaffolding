@@ -7,7 +7,11 @@ import grails.web.mapping.LinkGenerator
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.ToMany
 
-
+/**
+ * The default renderer for rendering bidirectional to many associations
+ *
+ * @author James Kleeh
+ */
 class BidirectionalToManyInputRenderer implements DomainInputRenderer {
 
     protected LinkGenerator linkGenerator

@@ -5,7 +5,10 @@ import grails.plugin.scaffolding.registry.DomainOutputRenderer
 import grails.util.GrailsNameUtils
 
 /**
- * Created by Jim on 5/24/2016.
+ * The renderer chosen for displaying domain properties when no other
+ * renderers support the given property
+ *
+ * @author James Kleeh
  */
 class DefaultOutputRenderer implements DomainOutputRenderer {
 

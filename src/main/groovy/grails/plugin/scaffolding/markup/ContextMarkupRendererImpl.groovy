@@ -2,23 +2,27 @@ package grails.plugin.scaffolding.markup
 
 import grails.plugin.scaffolding.model.property.DomainProperty
 import grails.util.GrailsNameUtils
+import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.context.MessageSource
 
 import javax.annotation.Resource
 
 /**
- * Created by Jim on 5/25/2016.
+ * @see {@link ContextMarkupRenderer}
+ * @author James Kleeh
  */
 class ContextMarkupRendererImpl implements ContextMarkupRenderer {
 
     @Resource
     MessageSource messageSource
 
+    @CompileStatic
     protected String getDefaultTableHeader(DomainProperty property) {
         property.defaultLabel
     }
 
+    @CompileStatic
     protected String getLabelText(DomainProperty property) {
         String labelText
         if (property.labelKeys) {
@@ -30,6 +34,7 @@ class ContextMarkupRendererImpl implements ContextMarkupRenderer {
         labelText
     }
 
+    @CompileStatic
     protected String resolveMessage(List<String> keysInPreferenceOrder, String defaultMessage) {
         def message = keysInPreferenceOrder.findResult { key ->
             messageSource.getMessage(key, [].toArray(), defaultMessage, Locale.default) ?: null
@@ -37,6 +42,7 @@ class ContextMarkupRendererImpl implements ContextMarkupRenderer {
         message ?: defaultMessage
     }
 
+    @CompileStatic
     protected String toPropertyNameFormat(Class type) {
         String propertyNameFormat = GrailsNameUtils.getLogicalPropertyName(type.canonicalName, '')
         if (propertyNameFormat.endsWith('[]')) {

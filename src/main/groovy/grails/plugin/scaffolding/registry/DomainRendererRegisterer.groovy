@@ -3,10 +3,16 @@ package grails.plugin.scaffolding.registry
 import grails.plugin.scaffolding.registry.input.*
 import grails.plugin.scaffolding.registry.output.DefaultOutputRenderer
 import grails.web.mapping.LinkGenerator
+import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import javax.annotation.PostConstruct
 
-
+/**
+ * Bean for registering the default domain renderers
+ *
+ * @author James Kleeh
+ */
+@CompileStatic
 class DomainRendererRegisterer {
 
     @Autowired

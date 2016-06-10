@@ -4,7 +4,9 @@ import grails.plugin.scaffolding.model.property.DomainProperty
 import grails.plugin.scaffolding.registry.DomainInputRenderer
 
 /**
- * Created by Jim on 5/23/2016.
+ * The default renderer for rendering properties with an inList constraint
+ *
+ * @author James Kleeh
  */
 class InListInputRenderer implements DomainInputRenderer {
 

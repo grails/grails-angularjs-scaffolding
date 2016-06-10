@@ -3,11 +3,17 @@ package grails.plugin.scaffolding.model
 import grails.plugin.scaffolding.model.property.DomainProperty
 import grails.plugin.scaffolding.model.property.DomainPropertyFactory
 import grails.util.GrailsClassUtils
+import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Embedded
 import org.springframework.beans.factory.annotation.Autowired
 
+/**
+ * @see {@link DomainModelService}
+ * @author James Kleeh
+ */
+@CompileStatic
 class DomainModelServiceImpl implements DomainModelService {
 
     @Autowired
@@ -18,9 +24,16 @@ class DomainModelServiceImpl implements DomainModelService {
             domainPropertyFactory.build(it)
         }
         List blacklist = ['version', 'dateCreated', 'lastUpdated']
-        def scaffoldProp = GrailsClassUtils.getStaticPropertyValue(domainClass.javaClass, 'scaffold')
-        if (scaffoldProp) {
-            blacklist.addAll(scaffoldProp.exclude)
+        Object scaffoldProp = GrailsClassUtils.getStaticPropertyValue(domainClass.javaClass, 'scaffold')
+        if (scaffoldProp instanceof Map) {
+            Map scaffold = (Map)scaffoldProp
+            if (scaffold.containsKey('exclude')) {
+                if (scaffold.exclude instanceof Collection) {
+                    blacklist.addAll((Collection)scaffold.exclude)
+                } else if (scaffold.exclude instanceof String) {
+                    blacklist.add((String)scaffold.exclude)
+                }
+            }
         }
         properties.removeAll { it.name in blacklist }
         properties.removeAll { !it.constraints.display }
@@ -39,8 +52,8 @@ class DomainModelServiceImpl implements DomainModelService {
         properties
     }
 
-    List<PersistentProperty> getShortListVisibleProperties(PersistentEntity domainClass) {
-        List<PersistentProperty> properties = getVisibleProperties(domainClass)
+    List<DomainProperty> getShortListVisibleProperties(PersistentEntity domainClass) {
+        List<DomainProperty> properties = getVisibleProperties(domainClass)
         if (properties.size() > 5) {
             properties = properties[0..5]
         }
@@ -53,27 +66,7 @@ class DomainModelServiceImpl implements DomainModelService {
         getEditableProperties(domainClass).each { DomainProperty domainProperty ->
             PersistentProperty property = domainProperty.persistentProperty
             if (property instanceof Embedded) {
-                getEditableProperties(property.associatedEntity).each { DomainProperty embedded ->
-                    embedded.rootProperty = domainProperty
-                    if (closure.call(embedded)) {
-                        properties.add(embedded)
-                    }
-                }
-            } else {
-                if (closure.call(domainProperty)) {
-                    properties.add(domainProperty)
-                }
-            }
-        }
-        properties
-    }
-
-    List<DomainProperty> findProperties(List<DomainProperty> propertyList, Closure closure) {
-        List<DomainProperty> properties = []
-        propertyList.each { DomainProperty domainProperty ->
-            PersistentProperty property = domainProperty.persistentProperty
-            if (property instanceof Embedded) {
-                getEditableProperties(property.associatedEntity).each { DomainProperty embedded ->
+                getEditableProperties(((Embedded)property).associatedEntity).each { DomainProperty embedded ->
                     embedded.rootProperty = domainProperty
                     if (closure.call(embedded)) {
                         properties.add(embedded)

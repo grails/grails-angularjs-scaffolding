@@ -1,10 +1,16 @@
 package grails.plugin.scaffolding.model.property
 
+import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 
+/**
+ * @see {@link DomainPropertyFactory}
+ * @author James Kleeh
+ */
+@CompileStatic
 class DomainPropertyFactoryImpl implements DomainPropertyFactory {
 
     @Value('${grails.databinding.convertEmptyStringsToNull:true}')

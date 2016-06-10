@@ -1,6 +1,8 @@
 package grails.plugin.scaffolding.registry
 
 import grails.plugin.scaffolding.model.property.DomainProperty
+import groovy.transform.CompileStatic
+
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -8,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger
  *
  * @author James Kleeh
  */
+@CompileStatic
 abstract class DomainRendererRegistry<T extends DomainRenderer> {
 
     protected SortedSet<Entry> domainRegistryEntries = new TreeSet<Entry>();
@@ -31,12 +34,12 @@ abstract class DomainRendererRegistry<T extends DomainRenderer> {
         null
     }
 
-    public class Entry implements Comparable<Entry> {
+    private class Entry implements Comparable<Entry> {
         protected final T renderer
         private final int priority;
         private final int seq;
 
-        private Entry(T renderer, int priority) {
+        Entry(T renderer, int priority) {
             this.renderer = renderer
             this.priority = priority
             seq = RENDERER_SEQUENCE.incrementAndGet()

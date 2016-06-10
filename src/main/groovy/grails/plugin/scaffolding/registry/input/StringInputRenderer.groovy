@@ -5,7 +5,9 @@ import grails.plugin.scaffolding.registry.DomainInputRenderer
 import grails.validation.Constrained
 
 /**
- * Created by Jim on 5/23/2016.
+ * The default renderer for rendering {@link String} properties
+ *
+ * @author James Kleeh
  */
 class StringInputRenderer implements DomainInputRenderer {
 

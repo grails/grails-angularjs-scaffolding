@@ -6,7 +6,9 @@ import grails.plugin.scaffolding.registry.DomainInputRenderer
 import java.sql.Blob
 
 /**
- * Created by Jim on 5/24/2016.
+ * The default renderer for rendering byte[] or Blob properties
+ *
+ * @author James Kleeh
  */
 class FileInputRenderer implements DomainInputRenderer {
 

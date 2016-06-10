@@ -2,15 +2,18 @@ package grails.plugin.scaffolding.markup
 
 import grails.plugin.scaffolding.model.DomainModelService
 import grails.plugin.scaffolding.model.property.DomainProperty
+import groovy.transform.CompileStatic
 import groovy.xml.MarkupBuilder
 import org.grails.buffer.FastStringWriter
 import org.grails.datastore.mapping.model.PersistentEntity
-import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Embedded
-import org.grails.datastore.mapping.model.types.ToMany
-import org.grails.datastore.mapping.model.types.ToOne
 import org.springframework.beans.factory.annotation.Autowired
 
+/**
+ * @see {@link DomainMarkupRenderer}
+ * @author James Kleeh
+ */
+@CompileStatic
 class DomainMarkupRendererImpl implements DomainMarkupRenderer {
 
     @Autowired

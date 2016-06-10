@@ -3,11 +3,14 @@ package grails.plugin.scaffolding.markup
 import grails.plugin.scaffolding.model.property.DomainProperty
 import grails.plugin.scaffolding.registry.DomainOutputRendererRegistry
 import grails.plugin.scaffolding.registry.DomainInputRendererRegistry
+import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 
 /**
- * Created by Jim on 5/25/2016.
+ * @see {@link PropertyMarkupRenderer}
+ * @author James Kleeh
  */
+@CompileStatic
 class PropertyMarkupRendererImpl implements PropertyMarkupRenderer {
 
     @Autowired

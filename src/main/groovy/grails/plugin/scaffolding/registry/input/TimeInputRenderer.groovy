@@ -4,7 +4,9 @@ import grails.plugin.scaffolding.model.property.DomainProperty
 import grails.plugin.scaffolding.registry.DomainInputRenderer
 
 /**
- * Created by Jim on 5/24/2016.
+ * The default renderer for rendering {@link java.sql.Time} properties
+ *
+ * @author James Kleeh
  */
 class TimeInputRenderer implements DomainInputRenderer {
 

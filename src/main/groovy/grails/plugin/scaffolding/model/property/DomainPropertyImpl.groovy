@@ -3,6 +3,7 @@ package grails.plugin.scaffolding.model.property
 import grails.core.GrailsDomainClass
 import grails.util.GrailsNameUtils
 import grails.validation.Constrained
+import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
@@ -12,7 +13,11 @@ import org.grails.validation.GrailsDomainClassValidator
 
 import static grails.validation.ConstrainedProperty.BLANK_CONSTRAINT
 
-
+/**
+ * @see {@link DomainProperty}
+ * @author James Kleeh
+ */
+@CompileStatic
 class DomainPropertyImpl implements DomainProperty {
 
     @Delegate PersistentProperty persistentProperty
@@ -55,7 +60,7 @@ class DomainPropertyImpl implements DomainProperty {
 
     Class getAssociatedType() {
         if (persistentProperty instanceof Association) {
-            if (persistentProperty.basic) {
+            if (((Association)persistentProperty).basic) {
                 ((Basic)persistentProperty).componentType
             } else {
                 associatedEntity.javaClass

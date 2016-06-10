@@ -2,10 +2,14 @@ package grails.plugin.scaffolding.registry.input
 
 import grails.plugin.scaffolding.model.property.DomainProperty
 import grails.plugin.scaffolding.registry.DomainInputRenderer
+import groovy.transform.CompileStatic
 
 /**
- * Created by Jim on 5/24/2016.
+ * The default renderer for rendering {@link TimeZone} properties
+ *
+ * @author James Kleeh
  */
+@CompileStatic
 class TimeZoneInputRenderer implements MapToSelectInputRenderer<TimeZone> {
 
     String getOptionValue(TimeZone timeZone) {
@@ -14,8 +18,9 @@ class TimeZoneInputRenderer implements MapToSelectInputRenderer<TimeZone> {
         String longName = timeZone.getDisplayName(timeZone.inDaylightTime(date), TimeZone.LONG)
 
         int offset = timeZone.rawOffset
-        def hour = offset / (60 * 60 * 1000)
-        def min = Math.abs(offset / (60 * 1000)) % 60
+        BigDecimal hour = offset / (60 * 60 * 1000)
+        BigDecimal minute = offset / (60 * 1000)
+        double min = Math.abs(minute.toDouble()) % 60
 
         "${shortName}, ${longName} ${hour}:${min} [${timeZone.ID}]"
     }
