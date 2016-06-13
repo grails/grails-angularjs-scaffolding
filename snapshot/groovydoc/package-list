@@ -1,0 +1,13 @@
+DefaultPackage
+grails.angular.scaffolding
+grails.plugin.scaffolding.angular
+grails.plugin.scaffolding.angular.json
+grails.plugin.scaffolding.angular.markup
+grails.plugin.scaffolding.angular.model
+grails.plugin.scaffolding.angular.registry
+grails.plugin.scaffolding.angular.registry.input
+grails.plugin.scaffolding.angular.registry.output
+grails.plugin.scaffolding.angular.template
+grails.plugin.scaffolding.command
+grails.plugin.scaffolding.io
+grails.plugin.scaffolding.template
