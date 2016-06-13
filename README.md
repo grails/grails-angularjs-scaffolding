@@ -4,6 +4,6 @@
 
 ## Documentation
 
-http://grails-plugins.github.io/grails-angular-scaffolding/docs/latest/index.html
+http://grails-plugins.github.io/grails-angular-scaffolding/latest
 
 
