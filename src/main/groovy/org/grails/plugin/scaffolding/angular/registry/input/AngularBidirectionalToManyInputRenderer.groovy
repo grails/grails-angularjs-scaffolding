@@ -24,7 +24,8 @@ class AngularBidirectionalToManyInputRenderer extends BidirectionalToManyInputRe
     @Override
     Closure renderInput(Map defaultAttributes, DomainProperty property) {
         final String stateName = GrailsNameUtils.getPropertyName(property.associatedType)
-        final String objectName = "${controllerName}.${getPropertyName(property)}.id"
+        final String identityName = property.domainClass.identity.name
+        final String objectName = "${controllerName}.${getPropertyName(property)}.${identityName}"
         return { ->
             a("Add ${getAssociatedClassName(property)}", ["ui-sref": "${stateName}.create({${getInverseSideName(property)}Id: ${objectName}})"])
         }
