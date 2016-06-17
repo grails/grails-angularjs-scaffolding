@@ -42,7 +42,7 @@ dependencies {
     provided "org.springframework.boot:spring-boot-autoconfigure"
     provided "org.springframework.boot:spring-boot-starter-tomcat"
     provided "org.grails:grails-dependencies"
-    compile "org.grails:scaffolding-core:1.0.0-SNAPSHOT"
+    compile "org.grails:scaffolding-core:1.0.0"
     profile "org.grails.profiles:plugin:3.2.0.BUILD-SNAPSHOT"
     testCompile "org.grails:grails-plugin-testing"
     documentation "org.codehaus.groovy:groovy-all:2.4.6"

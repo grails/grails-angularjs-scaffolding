@@ -1,14 +1,14 @@
 package grails.angular.scaffolding
 
-import grails.plugin.scaffolding.angular.markup.AngularPropertyMarkupRenderer
-import grails.plugin.scaffolding.command.GrailsApplicationCommand
-import grails.plugin.scaffolding.angular.model.AngularModel
+import org.grails.plugin.scaffolding.angular.markup.AngularPropertyMarkupRenderer
+import org.grails.plugin.scaffolding.command.GrailsApplicationCommand
+import org.grails.plugin.scaffolding.angular.model.AngularModel
 import org.grails.scaffolding.markup.DomainMarkupRenderer
 import org.grails.scaffolding.model.DomainModelService
 import org.grails.scaffolding.model.property.DomainProperty
-import grails.plugin.scaffolding.angular.template.AngularModuleEditor
-import grails.plugin.scaffolding.angular.template.AngularDomainHelper
-import grails.plugin.scaffolding.angular.template.CreateControllerHelper
+import org.grails.plugin.scaffolding.angular.template.AngularModuleEditor
+import org.grails.plugin.scaffolding.angular.template.AngularDomainHelper
+import org.grails.plugin.scaffolding.angular.template.CreateControllerHelper
 import grails.web.mapping.UrlMappings
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
@@ -55,7 +55,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         String showTemplate = domainMarkupRenderer.renderOutput(domainClass)
         String listTemplate = domainMarkupRenderer.renderListOutput(domainClass)
 
-        List<DomainProperty> associatedProperties = domainModelService.findEditableProperties(domainClass) { DomainProperty property ->
+        List<DomainProperty> associatedProperties = domainModelService.findInputProperties(domainClass) { DomainProperty property ->
             property.persistentProperty instanceof Association
         }
 
@@ -73,7 +73,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         }
 
         FileInputRenderer fileInputRenderer = new FileInputRenderer()
-        Boolean hasFileProperty = domainModelService.hasEditableProperty(domainClass) { DomainProperty property ->
+        Boolean hasFileProperty = domainModelService.hasInputProperty(domainClass) { DomainProperty property ->
             fileInputRenderer.supports(property)
         }
 
@@ -212,7 +212,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                 overwrite: false
 
         FileInputRenderer fileInputRenderer = new FileInputRenderer()
-        Boolean hasFileProperty = domainModelService.hasEditableProperty(property.associatedEntity) { DomainProperty domainProperty ->
+        Boolean hasFileProperty = domainModelService.hasInputProperty(property.associatedEntity) { DomainProperty domainProperty ->
             fileInputRenderer.supports(domainProperty)
         }
 
