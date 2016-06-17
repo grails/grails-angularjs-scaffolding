@@ -1,0 +1,3 @@
+== Customization
+
+This plugin is an extension of link:https://github.com/grails/scaffolding[Grails Scaffolding Core]. To change how markup is rendered in the templates, see the scaffolding core link:http://grails.github.io/scaffolding/{scaffoldingCoreVersion}/[documentation]

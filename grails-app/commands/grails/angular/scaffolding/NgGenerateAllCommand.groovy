@@ -39,6 +39,9 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
     @Value('${grails.codegen.angular.uiRouterPath:/angular/angular-ui-router}')
     String uiRouterPath
 
+    @Value('${grails.codegen.angular.angularPath:/angular/angular}')
+    String angularPath
+
     @Override
     boolean handle() {
 
@@ -90,7 +93,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
         render template: template('angular/javascripts/module.js'),
                 destination: module.file,
-                model: module.asMap() << [dependencies: dependencies, controllerAs: controllerName, createParams: createControllerHelper.stateParams],
+                model: module.asMap() << [angularPath: angularPath, dependencies: dependencies, controllerAs: controllerName, createParams: createControllerHelper.stateParams],
                 overwrite: true
 
         Map createEditInjections = [:]
@@ -208,7 +211,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
         render template: template('angular/javascripts/associatedModule.js'),
                 destination: module.file,
-                model: module.asMap() << [dependencies: dependencies, controllerAs: controllerName],
+                model: module.asMap() << [angularPath: angularPath, dependencies: dependencies, controllerAs: controllerName],
                 overwrite: false
 
         FileInputRenderer fileInputRenderer = new FileInputRenderer()

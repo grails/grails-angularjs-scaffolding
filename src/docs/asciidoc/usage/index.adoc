@@ -1,0 +1,45 @@
+== Usage
+
+To use this plugin, execute the `ngGenerateAll` command and pass the fully qualified path of a domain class
+
+[source,sh,indent="1"]
+----
+$ grails generateAll com.foo.Bar
+----
+
+The command will generate everything required to create, read, update, and delete instances of domain classes with AngularJS. The following will be created if they don't already exist.
+
+. A module for the domain `/grails-app/assets/javascripts/com/foo/com.foo.bar.js`.
+.. Modules for any associated domain classes.
+. Templates for create, edit, list, and show `/grails-app/assets/javascripts/com/foo/templates/create.tpl.html`.
+.. A form template will also be created that is used by both create and edit.
+. Controllers for create, edit, list, and show `/grails-app/assets/javascripts/com/foo/controllers/BarCreateController.js`.
+. A javascript representation of the domain class `/grails-app/assets/javascripts/com/foo/domain/Bar.js`.
+
+In addition, based on the properties of your domain, some other assets will be generated.
+
+=== File Properties
+
+If your domain contains a `byte[]`, `Byte[]`, or `java.sql.Blob` then a few things will change.
+
+. The javascript representation of the domain class will be modified to send a `FormData` instead of a standard JSON request body.
+. A directive will be created to store the representation of the file instead of `ng-model`, which doesn't support inputs of type file.
+
+=== Associations
+
+If your domain has associations to other domain classes, that will influence the scaffolding.
+
+. Services will be created to convert plain objects in response data to instances of their respective javascript domains
+. The javascript domain class will be updated to use the services created
+
+=== Supporting module
+
+If a module with the name "core" exists in the same directory that your module's directory is in, the core module will be considered the supporting module. Otherwise, the module for the domain being rendered will be considered the supporting module.
+
+The directive to assist with file uploads, as well as the services to assist with domain conversions will be stored in what is calculated to be the "supporting module". In addition, the core module will be defined as a dependency in the module being generated.
+
+=== Assumptions
+
+This plugin needs certain third party libraries to function and it assumes they are available. In addition to angular itself, the plugin relies on link:https://github.com/angular-ui/ui-router[ui-router] for routing.
+
+If you are using this plugin without the angular profile in Grails 3.2.0 or greater, it will be up to you to ensure those assets are available in the project. You can inform the plugin of their location with configuration.

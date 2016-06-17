@@ -1,0 +1,6 @@
+== Installation
+
+To start using this plugin, simply add it to your project. If you created your project with the angular profile in Grails 3.2.0 or higher, this is done automatically.
+
+[source,groovy,subs="attributes",indent=1]
+compile "{groupId}:{artifactId}:{version}"
