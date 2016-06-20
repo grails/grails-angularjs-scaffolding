@@ -4,19 +4,18 @@ To use this plugin, execute the `ngGenerateAll` command and pass the fully quali
 
 [source,sh,indent="1"]
 ----
-$ grails generateAll com.foo.Bar
+$ grails ngGenerateAll com.foo.Bar
 ----
 
 The command will generate everything required to create, read, update, and delete instances of domain classes with AngularJS. The following will be created if they don't already exist.
 
 . A module for the domain `/grails-app/assets/javascripts/com/foo/com.foo.bar.js`.
-.. Modules for any associated domain classes.
 . Templates for create, edit, list, and show `/grails-app/assets/javascripts/com/foo/templates/create.tpl.html`.
 .. A form template will also be created that is used by both create and edit.
 . Controllers for create, edit, list, and show `/grails-app/assets/javascripts/com/foo/controllers/BarCreateController.js`.
 . A javascript representation of the domain class `/grails-app/assets/javascripts/com/foo/domain/Bar.js`.
 
-In addition, based on the properties of your domain, some other assets will be generated.
+Based on the properties of your domain, some other assets may be generated.
 
 === File Properties
 
@@ -31,12 +30,19 @@ If your domain has associations to other domain classes, that will influence the
 
 . Services will be created to convert plain objects in response data to instances of their respective javascript domains
 . The javascript domain class will be updated to use the services created
+. Modules and JavaScript domain classes will be created for all associated entities. The assets created by this process are designed to be used solely by the associated domain, not by a separate CRUD interface.
+
+IMPORTANT: When generating assets for a domain class that already has a module and a JavaScript domain class created via an association, ensure you inform the command to overwrite.
+[source,sh,indent="1"]
+----
+$ grails ngGenerateAll com.foo.Bar true
+----
 
 === Supporting module
 
-If a module with the name "core" exists in the same directory that your module's directory is in, the core module will be considered the supporting module. Otherwise, the module for the domain being rendered will be considered the supporting module.
+If a module with the name "core" exists in the same directory that your module's directory is in, the core module will be considered the "supporting module". Otherwise, the module for the domain being rendered will be considered the supporting module.
 
-The directive to assist with file uploads, as well as the services to assist with domain conversions will be stored in what is calculated to be the "supporting module". In addition, the core module will be defined as a dependency in the module being generated.
+The directive to assist with file uploads, as well as the services to assist with domain conversions will be stored in what is calculated to be the supporting module. In addition, the core module will be defined as a dependency in the module being generated.
 
 === Assumptions
 

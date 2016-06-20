@@ -1,1 +1,23 @@
 == Configuration
+
+This plugin exposes a few configuration options to control how assets are rendered:
+
+=== Controller Name
+
+JavaScript templates and controllers are designed to use the "controllerAs" syntax. You can control what name is used:
+
+`grails.codegen.angular.controllerName`. The default value is `vm`.
+
+=== Asset Paths
+
+To specify where the angular source JavaScript is:
+
+`grails.codegen.angular.angularPath`. The default value is `/angular/angular`.
+
+To specify where the ui-router source JavaScript is:
+
+`grails.codegen.angular.uiRouterPath`. The default value is `/angular/angular-ui-router`.
+
+To specify what base folder assets should be created in under `grails-app/assets`:
+
+`grails.codegen.angular.assetDir`. The default is value `javascripts`.

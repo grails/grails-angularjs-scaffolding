@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value
 
 class AngularPropertyMarkupRendererImpl extends PropertyMarkupRendererImpl implements AngularPropertyMarkupRenderer {
 
-    @Value('${grails.plugin.angular.scaffolding.controllerName:vm}')
+    @Value('${grails.codegen.angular.controllerName:vm}')
     String controllerName
 
     @Override

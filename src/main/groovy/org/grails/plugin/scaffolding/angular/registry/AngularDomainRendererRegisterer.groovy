@@ -41,7 +41,7 @@ class AngularDomainRendererRegisterer {
 
         domainOutputRendererRegistry.registerDomainRenderer(new AngularDefaultOutputRenderer(controllerName), 0)
         domainOutputRendererRegistry.registerDomainRenderer(new AngularDateOutputRenderer(controllerName), 0)
-        domainOutputRendererRegistry.registerDomainRenderer(new AngularIdOutputRenderer(), 0)
+        domainOutputRendererRegistry.registerDomainRenderer(new AngularIdOutputRenderer(controllerName), 0)
         domainOutputRendererRegistry.registerDomainRenderer(new AngularToManyOutputRenderer(controllerName), 0)
         domainOutputRendererRegistry.registerDomainRenderer(new AngularToOneOutputRenderer(controllerName), 0)
 

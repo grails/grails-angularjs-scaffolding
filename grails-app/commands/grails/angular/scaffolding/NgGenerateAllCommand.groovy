@@ -1,5 +1,6 @@
 package grails.angular.scaffolding
 
+import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.plugin.scaffolding.angular.markup.AngularPropertyMarkupRenderer
 import org.grails.plugin.scaffolding.command.GrailsApplicationCommand
 import org.grails.plugin.scaffolding.angular.model.AngularModel
@@ -47,6 +48,8 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
         String domainClassName = args[0]
 
+        boolean overwrite = (args[1] == "true")
+
         try {
             domainClass = grailsDomainClassMappingContext.getPersistentEntity(domainClassName)
         } catch (e) {
@@ -59,7 +62,8 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         String listTemplate = domainMarkupRenderer.renderListOutput(domainClass)
 
         List<DomainProperty> associatedProperties = domainModelService.findInputProperties(domainClass) { DomainProperty property ->
-            property.persistentProperty instanceof Association
+            PersistentProperty prop = property.persistentProperty
+            prop instanceof Association && !prop.bidirectional
         }
 
         AngularModel module = model(domainClass.javaClass)
@@ -94,7 +98,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         render template: template('angular/javascripts/module.js'),
                 destination: module.file,
                 model: module.asMap() << [angularPath: angularPath, dependencies: dependencies, controllerAs: controllerName, createParams: createControllerHelper.stateParams],
-                overwrite: true
+                overwrite: overwrite
 
         Map createEditInjections = [:]
 
@@ -109,24 +113,24 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         render template: template('angular/views/create.tpl.html'),
                 destination: file("${basePath}/${modulePath}/templates/create.tpl.html"),
                 model: module.asMap() << [controllerName: controllerName],
-                overwrite: true
+                overwrite: overwrite
 
         render template: template('angular/views/edit.tpl.html'),
                 destination: file("${basePath}/${modulePath}/templates/edit.tpl.html"),
                 model: module.asMap() << [controllerName: controllerName],
-                overwrite: true
+                overwrite: overwrite
 
         render(formTemplate, file("${basePath}/${modulePath}/templates/form.tpl.html"), [:], true)
 
         render template: template('angular/views/show.tpl.html'),
                 destination: file("${basePath}/${modulePath}/templates/show.tpl.html"),
                 model: module.asMap() << [showForm: showTemplate, controllerName: controllerName],
-                overwrite: true
+                overwrite: overwrite
 
         render template: template('angular/views/list.tpl.html'),
                 destination: file("${basePath}/${modulePath}/templates/list.tpl.html"),
                 model: module.asMap() << [listTemplate: listTemplate, controllerName: controllerName],
-                overwrite: true
+                overwrite: overwrite
 
 
         Map artefactParams = module.asMap() << [controllerAs: controllerName]
@@ -135,7 +139,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
             render template: template("angular/javascripts/directives/fileModel.js"),
                     destination: file("${basePath}/${supportingModule.modulePath}/directives/fileModel.js"),
                     model: [moduleName: supportingModule.moduleName],
-                    overwrite: true
+                    overwrite: overwrite
         }
 
         if (associatedProperties) {
@@ -143,46 +147,46 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                 render template: template("angular/javascripts/services/domainToManyConversion.js"),
                         destination: file("${basePath}/${supportingModule.modulePath}/services/domainToManyConversion.js"),
                         model: [moduleName: supportingModule.moduleName],
-                        overwrite: true
+                        overwrite: overwrite
             }
 
             render template: template("angular/javascripts/services/domainListConversion.js"),
                     destination: file("${basePath}/${supportingModule.modulePath}/services/domainListConversion.js"),
                     model: [moduleName: supportingModule.moduleName],
-                    overwrite: true
+                    overwrite: overwrite
 
             render template: template("angular/javascripts/services/domainConversion.js"),
                     destination: file("${basePath}/${supportingModule.modulePath}/services/domainConversion.js"),
                     model: [moduleName: supportingModule.moduleName],
-                    overwrite: true
+                    overwrite: overwrite
         }
 
         render template: template('angular/javascripts/controllers/createController.js'),
                destination: file("${basePath}/${modulePath}/controllers/${module.propertyName}CreateController.js"),
                model: artefactParams << [injections: createEditInjections, createParams: createControllerHelper.controllerStatements],
-               overwrite: true
+               overwrite: overwrite
 
         render template: template('angular/javascripts/controllers/editController.js'),
                destination: file("${basePath}/${modulePath}/controllers/${module.propertyName}EditController.js"),
                model: artefactParams << [injections: createEditInjections],
-               overwrite: true
+               overwrite: overwrite
 
         render template: template('angular/javascripts/controllers/listController.js'),
                destination: file("${basePath}/${modulePath}/controllers/${module.propertyName}ListController.js"),
                model: artefactParams,
-               overwrite: true
+               overwrite: overwrite
 
         render template: template('angular/javascripts/controllers/showController.js'),
                destination: file("${basePath}/${modulePath}/controllers/${module.propertyName}ShowController.js"),
                model: artefactParams,
-               overwrite: true
+               overwrite: overwrite
 
         AngularDomainHelper angularDomainHelper = new AngularDomainHelper(domainClass, associatedProperties, grailsUrlMappingsHolder)
 
         render template: template("angular/javascripts/${hasFileProperty ? "multipartDomain" : "domain"}.js"),
                destination: file("${basePath}/${modulePath}/domain/${module.className}.js"),
                model: artefactParams << [injections: angularDomainHelper.moduleConfig, getConfig: angularDomainHelper.getConfig, queryConfig: angularDomainHelper.queryConfig, uri: angularDomainHelper.uri],
-               overwrite: true
+               overwrite: overwrite
 
 
         true
