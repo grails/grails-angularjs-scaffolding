@@ -432,14 +432,30 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_customization">Customization</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This plugin is an extension of <a href="https://github.com/grails/scaffolding">Grails Scaffolding Core</a>. To change how markup is rendered in the templates, see the scaffolding core <a href="http://grails.github.io/scaffolding/1.0.0/">documentation</a></p>
+<p>This plugin is an extension of <a href="https://github.com/grails/scaffolding">Grails Scaffolding Core</a>. To change how markup is rendered in the html templates, see the scaffolding core <a href="http://grails.github.io/scaffolding/1.0.0/">documentation</a>. The following changes have been made:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The <code>propertyMarkupRenderer</code> bean has been set to an instance of <a href="api/org/grails/plugin/scaffolding/angular/markup/AngularPropertyMarkupRenderer.groovy">AngularPropertyMarkupRenderer</a> that only overrides the <a href="api/org/grails/plugin/scaffolding/angular/markup/AngularPropertyMarkupRendererImpl.html#getStandardAttributes(DomainProperty)">getStandardAttributes</a> method to add an <code>ng-model</code> attribute. You can register your own <code>propertyMarkupRenderer</code> by extending <a href="api/org/grails/plugin/scaffolding/angular/markup/AngularPropertyMarkupRendererImpl.groovy">AngularPropertyMarkupRendererImpl</a>.</p>
+</li>
+<li>
+<p>The <code>contextMarkupRenderer</code> has been set to an instance of <a href="api/org/grails/plugin/scaffolding/angular/markup/AngularContextMarkupRenderer.groovy">AngularContextMarkupRenderer</a> that overrides the list output context to use an <code>ng-repeat</code>. You can register your own <code>contextMarkupRenderer</code> by extending <a href="api/org/grails/plugin/scaffolding/angular/markup/AngularContextMarkupRendererImpl.groovy">AngularContextMarkupRendererImpl</a>.</p>
+</li>
+<li>
+<p>Additional input and output renderers are registered with a priority of 0. If you wish your own renderers to be used, set a priority higher than 0. See the <a href="http://grails.github.io/scaffolding/1.0.0/#_how_properties_are_rendered">section on how properties are rendered</a> in the scaffolding core documentation for more details on how to do so.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The JavaScript templates used to create assets can be overridden by executing <code>grails ngInstallTemplates</code>. That will put a set of files in <code>src/main/templates/angular</code>. You can modify the templates and they will be used in future angular code generation. You can safely remove any templates that you do not wish to override.</p>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-17 20:13:16 UTC
+Last updated 2016-06-20 17:15:15 UTC
 </div>
 </div>
 </body>

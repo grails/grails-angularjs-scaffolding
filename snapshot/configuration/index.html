@@ -423,7 +423,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_configuration">Configuration</a></li>
+<li><a href="#_configuration">Configuration</a>
+<ul class="sectlevel2">
+<li><a href="#_controller_name">Controller Name</a></li>
+<li><a href="#_asset_paths">Asset Paths</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -431,13 +436,45 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect1">
 <h2 id="_configuration">Configuration</h2>
 <div class="sectionbody">
-
+<div class="paragraph">
+<p>This plugin exposes a few configuration options to control how assets are rendered:</p>
+</div>
+<div class="sect2">
+<h3 id="_controller_name">Controller Name</h3>
+<div class="paragraph">
+<p>JavaScript templates and controllers are designed to use the "controllerAs" syntax. You can control what name is used:</p>
+</div>
+<div class="paragraph">
+<p><code>grails.codegen.angular.controllerName</code>. The default value is <code>vm</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_asset_paths">Asset Paths</h3>
+<div class="paragraph">
+<p>To specify where the angular source JavaScript is:</p>
+</div>
+<div class="paragraph">
+<p><code>grails.codegen.angular.angularPath</code>. The default value is <code>/angular/angular</code>.</p>
+</div>
+<div class="paragraph">
+<p>To specify where the ui-router source JavaScript is:</p>
+</div>
+<div class="paragraph">
+<p><code>grails.codegen.angular.uiRouterPath</code>. The default value is <code>/angular/angular-ui-router</code>.</p>
+</div>
+<div class="paragraph">
+<p>To specify what base folder assets should be created in under <code>grails-app/assets</code>:</p>
+</div>
+<div class="paragraph">
+<p><code>grails.codegen.angular.assetDir</code>. The default is value <code>javascripts</code>.</p>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-17 20:13:16 UTC
+Last updated 2016-06-20 17:15:15 UTC
 </div>
 </div>
 </body>
