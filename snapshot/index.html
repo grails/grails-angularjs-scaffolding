@@ -553,11 +553,20 @@ table.CodeRay td.code>pre{padding:0}
 <h2 id="_installation">2. Installation</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To start using this plugin, simply add it to your project. If you created your project with the angular profile in Grails 3.2.0 or higher, this is done automatically.</p>
+<p>To start using this plugin, add it to your <code>build.gradle</code> like the example below. If you created your project with the angular profile in Grails 3.2.0 or higher, this is done automatically.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"> compile "org.grails.plugins:angular-scaffolding:1.0.0.BUILD-SNAPSHOT"</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy"> buildscript {
+     ...
+     dependencies {
+         classpath "org.grails.plugins:angular-scaffolding:1.0.0.BUILD-SNAPSHOT"
+     }
+ }
+ dependencies {
+     ...
+     compile "org.grails.plugins:angular-scaffolding:1.0.0.BUILD-SNAPSHOT"
+ }</code></pre>
 </div>
 </div>
 </div>
@@ -739,7 +748,7 @@ When generating assets for a domain class that already has a module and a JavaSc
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-20 17:15:15 UTC
+Last updated 2016-06-21 14:41:31 UTC
 </div>
 </div>
 </body>
