@@ -44,8 +44,40 @@ If a module with the name "core" exists in the same directory that your module's
 
 The directive to assist with file uploads, as well as the services to assist with domain conversions will be stored in what is calculated to be the supporting module. In addition, the core module will be defined as a dependency in the module being generated.
 
+Example:
+[source,sh,indent="1"]
+----
+$ grails ngGenerateAll com.foo.Bar
+----
+
+The scaffolding will look for `/grails-app/assets/javascripts/com/foo/core/com.foo.core.js`. If it is found, it will be the supporting module.
+
 === Assumptions
 
 This plugin needs certain third party libraries to function and it assumes they are available. In addition to angular itself, the plugin relies on link:https://github.com/angular-ui/ui-router[ui-router] for routing.
 
 If you are using this plugin without the angular profile in Grails 3.2.0 or greater, it will be up to you to ensure those assets are available in the project. You can inform the plugin of their location with configuration.
+
+=== Routing
+
+If you are using the angular profile in Grails 3.2.0 or higher, the default index page is modified so that clicking on the link to the controller will automatically route you to the module the controller represents. If you are using this plugin in an existing application, you will have a little bit of work to do to use the generated assets.
+
+The first step is to ensure the module is included in the page. If a parent module is found, a dependency will automatically be created, however it is up to you to ensure the parent module or the generated module is included on the page using asset pipeline as you normally would.
+
+Example:
+[source,sh,indent="1"]
+----
+$ grails ngGenerateAll com.foo.Bar
+----
+
+If `/grails-app/assets/javascripts/com/foo/com.foo.js` exists, a dependency will be created in `com.foo.js` to require `/com/foo/bar/com.foo.bar.js`.
+
+The following states are defined in generated modules:
+
+. `/domain`
+. `/domain/create`
+. `/domain/edit/:id`
+. `/domain/show/:id`
+
+Assuming the script has been loaded on the index page and there is a `ui-view` directive on the index page, the URL would be `http://localhost:8080/#domain`. See the documentation for link:https://github.com/angular-ui/ui-router/wiki[UI-Router] for more information.
+

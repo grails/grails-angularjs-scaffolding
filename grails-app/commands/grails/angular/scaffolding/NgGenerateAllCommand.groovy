@@ -29,13 +29,13 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
     private PersistentEntity domainClass
 
-    String assetPath
+
+
+    @Value('${grails.codegen.angular.baseDir:grails-app/assets}')
+    String baseDir
 
     @Value('${grails.codegen.angular.assetDir:javascripts}')
-    String setAssetPath(String assetPath) {
-        this.assetPath = assetPath
-        this.basePath = "grails-app/assets/${assetPath}"
-    }
+    String assetPath
 
     @Value('${grails.codegen.angular.uiRouterPath:/angular/angular-ui-router}')
     String uiRouterPath
@@ -45,6 +45,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
     @Override
     boolean handle() {
+        this.basePath = "$baseDir/$assetPath"
 
         String domainClassName = args[0]
 

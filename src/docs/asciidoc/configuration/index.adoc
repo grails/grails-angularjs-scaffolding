@@ -18,6 +18,10 @@ To specify where the ui-router source JavaScript is:
 
 `grails.codegen.angular.uiRouterPath`. The default value is `/angular/angular-ui-router`.
 
-To specify what base folder assets should be created in under `grails-app/assets`:
+To specify the base directory where assets should be created:
+
+`grails.codegen.angular.baseDir`. The default value is `grails-app/assets`.
+
+To specify what base folder assets should be created in under the base directory:
 
 `grails.codegen.angular.assetDir`. The default is value `javascripts`.
