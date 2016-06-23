@@ -1,4 +1,5 @@
 //= wrapped
+//= require /angular/angular-resource
 
 angular
     .module("${moduleName}")

@@ -25,6 +25,7 @@ class AngularDomainHelper {
                     .createURL(Collections.emptyMap(), 'UTF8')
                     .replaceFirst('/', '')
         } catch (UrlMappingException e) {
+            println e
             uri = domain.decapitalizedName
         }
         this.uri = uri

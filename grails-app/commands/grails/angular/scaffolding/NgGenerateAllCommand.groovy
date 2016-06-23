@@ -1,6 +1,7 @@
 package grails.angular.scaffolding
 
 import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.Embedded
 import org.grails.plugin.scaffolding.angular.markup.AngularPropertyMarkupRenderer
 import org.grails.plugin.scaffolding.command.GrailsApplicationCommand
 import org.grails.plugin.scaffolding.angular.model.AngularModel
@@ -43,13 +44,16 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
     @Value('${grails.codegen.angular.angularPath:/angular/angular}')
     String angularPath
 
+    @Value('${grails.codegen.angular.ngResourcePath:/angular/angular-resource}')
+    String ngResourcePath
+
     @Override
     boolean handle() {
         this.basePath = "$baseDir/$assetPath"
 
         String domainClassName = args[0]
 
-        boolean overwrite = (args[1] == "true")
+        boolean overwrite = (args[1] instanceof String && args[1].toLowerCase() == "true")
 
         try {
             domainClass = grailsDomainClassMappingContext.getPersistentEntity(domainClassName)
@@ -71,7 +75,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
         AngularModel supportingModule = module
 
-        Map dependencies = ['"ui.router"': uiRouterPath]
+        Map dependencies = ['"ui.router"': uiRouterPath, '"ngResource"': ngResourcePath]
 
         AngularModel coreModule = model("${module.packageName}.Core")
 
@@ -195,7 +199,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
     AngularModel handleAssociatedProperty(DomainProperty property) {
         AngularModel module = model(property.associatedType)
-
+        PersistentEntity domainClass = property.associatedEntity
         final String controllerName = propertyMarkupRenderer.controllerName
 
         AngularModel parentModule = module.parentModule
@@ -220,7 +224,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                 overwrite: false
 
         FileInputRenderer fileInputRenderer = new FileInputRenderer()
-        Boolean hasFileProperty = domainModelService.hasInputProperty(property.associatedEntity) { DomainProperty domainProperty ->
+        Boolean hasFileProperty = domainModelService.hasInputProperty(domainClass) { DomainProperty domainProperty ->
             fileInputRenderer.supports(domainProperty)
         }
 

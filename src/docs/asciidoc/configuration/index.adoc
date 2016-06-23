@@ -10,18 +10,26 @@ JavaScript templates and controllers are designed to use the "controllerAs" synt
 
 === Asset Paths
 
-To specify where the angular source JavaScript is:
+|===
+|Config Key |Description |Default Value
 
-`grails.codegen.angular.angularPath`. The default value is `/angular/angular`.
+|`grails.codegen.angular.angularPath`
+|Angular source require path
+|`/angular/angular`
 
-To specify where the ui-router source JavaScript is:
+|`grails.codegen.angular.uiRouterPath`
+|UI Router source require path
+|`/angular/angular-ui-router`
 
-`grails.codegen.angular.uiRouterPath`. The default value is `/angular/angular-ui-router`.
+|`grails.codegen.angular.ngResourcePath`
+|Angular ngResource source require path
+|`/angular/angular-resource`
 
-To specify the base directory where assets should be created:
+|`grails.codegen.angular.baseDir`
+|The base directory where assets should be stored
+|`grails-app/assets`
 
-`grails.codegen.angular.baseDir`. The default value is `grails-app/assets`.
-
-To specify what base folder assets should be created in under the base directory:
-
-`grails.codegen.angular.assetDir`. The default is value `javascripts`.
+|`grails.codegen.angular.assetDir`
+|The sub directory where assets should be stored
+|`javascripts`
+|===
