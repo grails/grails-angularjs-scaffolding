@@ -22,10 +22,9 @@ class AngularDomainHelper {
         try {
             uri = urlMappings
                     .getReverseMapping(domain.decapitalizedName, "index", null, null, "GET", Collections.emptyMap())
-                    .createURL(Collections.emptyMap(), 'UTF8')
+                    .createURL([controller: domain.decapitalizedName], 'UTF8')
                     .replaceFirst('/', '')
         } catch (UrlMappingException e) {
-            println e
             uri = domain.decapitalizedName
         }
         this.uri = uri

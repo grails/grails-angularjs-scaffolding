@@ -1,7 +1,6 @@
 package grails.angular.scaffolding
 
 import org.grails.datastore.mapping.model.PersistentProperty
-import org.grails.datastore.mapping.model.types.Embedded
 import org.grails.plugin.scaffolding.angular.markup.AngularPropertyMarkupRenderer
 import org.grails.plugin.scaffolding.command.GrailsApplicationCommand
 import org.grails.plugin.scaffolding.angular.model.AngularModel
@@ -68,21 +67,21 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
         List<DomainProperty> associatedProperties = domainModelService.findInputProperties(domainClass) { DomainProperty property ->
             PersistentProperty prop = property.persistentProperty
-            prop instanceof Association && !prop.bidirectional
+            prop instanceof Association
         }
 
         AngularModel module = model(domainClass.javaClass)
-
-        AngularModel supportingModule = module
 
         Map dependencies = ['"ui.router"': uiRouterPath, '"ngResource"': ngResourcePath]
 
         AngularModel coreModule = model("${module.packageName}.Core")
 
-        if (coreModule.exists()) {
-            dependencies["\"${coreModule.moduleName}\""] = "/${coreModule.modulePath}/${coreModule.moduleName}"
-            supportingModule = coreModule
-        }
+        render template: template('angular/javascripts/coreModule.js'),
+                destination: coreModule.file,
+                model: coreModule.asMap() << [angularPath: angularPath],
+                overwrite: false
+
+        dependencies["\"${coreModule.moduleName}\""] = "/${coreModule.modulePath}/${coreModule.moduleName}"
 
         FileInputRenderer fileInputRenderer = new FileInputRenderer()
         Boolean hasFileProperty = domainModelService.hasInputProperty(domainClass) { DomainProperty property ->
@@ -142,27 +141,27 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
         if (hasFileProperty) {
             render template: template("angular/javascripts/directives/fileModel.js"),
-                    destination: file("${basePath}/${supportingModule.modulePath}/directives/fileModel.js"),
-                    model: [moduleName: supportingModule.moduleName],
+                    destination: file("${basePath}/${coreModule.modulePath}/directives/fileModel.js"),
+                    model: [moduleName: coreModule.moduleName],
                     overwrite: overwrite
         }
 
         if (associatedProperties) {
             if (associatedProperties.any { it.persistentProperty instanceof ToMany}) {
                 render template: template("angular/javascripts/services/domainToManyConversion.js"),
-                        destination: file("${basePath}/${supportingModule.modulePath}/services/domainToManyConversion.js"),
-                        model: [moduleName: supportingModule.moduleName],
+                        destination: file("${basePath}/${coreModule.modulePath}/services/domainToManyConversion.js"),
+                        model: [moduleName: coreModule.moduleName],
                         overwrite: overwrite
             }
 
             render template: template("angular/javascripts/services/domainListConversion.js"),
-                    destination: file("${basePath}/${supportingModule.modulePath}/services/domainListConversion.js"),
-                    model: [moduleName: supportingModule.moduleName],
+                    destination: file("${basePath}/${coreModule.modulePath}/services/domainListConversion.js"),
+                    model: [moduleName: coreModule.moduleName],
                     overwrite: overwrite
 
             render template: template("angular/javascripts/services/domainConversion.js"),
-                    destination: file("${basePath}/${supportingModule.modulePath}/services/domainConversion.js"),
-                    model: [moduleName: supportingModule.moduleName],
+                    destination: file("${basePath}/${coreModule.modulePath}/services/domainConversion.js"),
+                    model: [moduleName: coreModule.moduleName],
                     overwrite: overwrite
         }
 
@@ -185,6 +184,8 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                destination: file("${basePath}/${modulePath}/controllers/${module.propertyName}ShowController.js"),
                model: artefactParams,
                overwrite: overwrite
+
+
 
         AngularDomainHelper angularDomainHelper = new AngularDomainHelper(domainClass, associatedProperties, grailsUrlMappingsHolder)
 
