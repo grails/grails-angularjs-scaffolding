@@ -27,7 +27,7 @@ class AngularDomainHelperSpec extends Specification {
     void "test constructor"() {
         given:
         PersistentEntity domain = Mock(PersistentEntity) {
-            1 * getDecapitalizedName() >> "foo"
+            2 * getDecapitalizedName() >> "foo"
         }
         List<DomainProperty> properties = [
                 build("a", String, OneToMany),
@@ -38,7 +38,7 @@ class AngularDomainHelperSpec extends Specification {
         ]
         UrlMappings urlMappings = Mock(UrlMappings) {
             1 * getReverseMapping("foo", "index", null, null, "GET", [:]) >> Mock(UrlCreator) {
-                1 * createURL([:], 'UTF8') >> "/bar"
+                1 * createURL([controller: "foo"], 'UTF8') >> "/bar"
             }
         }
 
