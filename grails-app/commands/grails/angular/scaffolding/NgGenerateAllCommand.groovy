@@ -29,8 +29,6 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
     private PersistentEntity domainClass
 
-
-
     @Value('${grails.codegen.angular.baseDir:grails-app/assets}')
     String baseDir
 

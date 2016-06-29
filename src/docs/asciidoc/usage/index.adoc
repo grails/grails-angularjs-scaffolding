@@ -1,10 +1,17 @@
 == Usage
 
-To use this plugin, execute the `ngGenerateAll` command and pass the fully qualified path of a domain class
+To use this plugin, execute the `ngGenerateAll` command and pass the fully qualified path of a domain class.
 
 [source,sh,indent="1"]
 ----
 $ grails ngGenerateAll com.foo.Bar
+----
+
+You can also execute the command via Gradle.
+
+[source,sh,indent="1"]
+----
+$ ./gradlew ngGenerateAll -Pargs="com.foo.Bar"
 ----
 
 The command will generate everything required to create, read, update, and delete instances of domain classes with AngularJS. The following will be created if they don't already exist.
@@ -38,11 +45,11 @@ IMPORTANT: When generating assets for a domain class that already has a module a
 $ grails ngGenerateAll com.foo.Bar true
 ----
 
-=== Supporting module
+=== Core Module
 
-If a module with the name "core" exists in the same directory that your module's directory is in, the core module will be considered the "supporting module". Otherwise, the module for the domain being rendered will be considered the supporting module.
+If a module with the name "core" exists in the same directory that your module's directory is in, the core module will be considered the "supporting module". Otherwise, the core module will be created for you.
 
-The directive to assist with file uploads, as well as the services to assist with domain conversions will be stored in what is calculated to be the supporting module. In addition, the core module will be defined as a dependency in the module being generated.
+The directive to assist with file uploads, as well as the services to assist with domain conversions will be stored in the core module. In addition, the core module will be defined as a dependency in the module being generated.
 
 Example:
 [source,sh,indent="1"]
@@ -50,13 +57,80 @@ Example:
 $ grails ngGenerateAll com.foo.Bar
 ----
 
-The scaffolding will look for `/grails-app/assets/javascripts/com/foo/core/com.foo.core.js`. If it is found, it will be the supporting module.
+The scaffolding will look for `/grails-app/assets/javascripts/com/foo/core/com.foo.core.js`.
 
 === Assumptions
 
-This plugin needs certain third party libraries to function and it assumes they are available. In addition to angular itself, the plugin relies on link:https://github.com/angular-ui/ui-router[ui-router] for routing.
+This plugin needs certain third party libraries to function and it assumes they are available. In addition to angular itself, the plugin relies on link:https://github.com/angular-ui/ui-router[ui-router] for routing and the Angular resource module for making REST calls.
 
 If you are using this plugin without the angular profile in Grails 3.2.0 or greater, it will be up to you to ensure those assets are available in the project. You can inform the plugin of their location with configuration.
+
+Here is how you might use the link:https://github.com/craigburke/client-dependencies-gradle[Client Dependencies] plugin to download the required assets automatically and put them in the place the scaffolding expects by default.
+
+[source,groovy,indent=1]
+.build.gradle
+----
+buildscript {
+    ...
+    dependencies {
+        classpath "com.craigburke.gradle:client-dependencies:1.1.1"
+    }
+}
+
+apply plugin:"com.craigburke.client-dependencies"
+
+clientDependencies {
+    npm {
+        'angular'('1.5.x', into: 'angular') {
+            include 'angular.js'
+        }
+        'angular-resource'('1.5.x', into: 'angular') {
+            include 'angular-resource.js'
+        }
+        'angular-ui-router'('0.2.x', into: 'angular', from: 'release') {
+            include 'angular-ui-router.js'
+        }
+    }
+}
+----
+
+==== Dependencies
+
+The generated scaffolding assumes the following asset pipeline plugins are being used in your project. If you are using the angular profile, the necessary dependencies are included by default.
+
+[source,groovy,indent=1]
+.build.gradle
+----
+dependencies {
+    ...
+    assets "com.craigburke.angular:angular-template-asset-pipeline:2.3.0"
+    assets "com.craigburke.angular:angular-annotate-asset-pipeline:2.4.1"
+    assets "com.craigburke:js-closure-wrap-asset-pipeline:1.2.0"
+}
+----
+
+See the respective Github pages for more information on each of the plugins.
+
+link:https://github.com/craigburke/angular-annotate-asset-pipeline[Angular Annotate Asset Pipeline]
+
+link:https://github.com/craigburke/angular-template-asset-pipeline[Angular Template Asset Pipeline]
+
+link:https://github.com/craigburke/js-closure-wrap-asset-pipeline[JS Closure Wrap Asset Pipeline]
+
+==== Dates
+
+In order for the scaffolding to work as designed, the databinding needs an additional date format to correctly parse date values sent by the client. The necessary format has been added by default in Grails 3.2.0.
+
+Here is an example on how to configure the format.
+
+[source,yaml,indent="1"]
+.application.yml
+----
+grails:
+    databinding:
+        dateFormats:
+            "yyyy-MM-dd'T'HH:mm:ss.SSSX"
+----
 
 === Routing
 
