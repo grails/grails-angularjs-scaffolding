@@ -526,7 +526,7 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel2">
 <li><a href="#_file_properties">3.1. File Properties</a></li>
 <li><a href="#_associations">3.2. Associations</a></li>
-<li><a href="#_supporting_module">3.3. Supporting module</a></li>
+<li><a href="#_core_module">3.3. Core Module</a></li>
 <li><a href="#_assumptions">3.4. Assumptions</a></li>
 <li><a href="#_routing">3.5. Routing</a></li>
 </ul>
@@ -557,6 +557,7 @@ table.CodeRay td.code>pre{padding:0}
 <p>To start using this plugin, add it to your <code>build.gradle</code> like the example below. If you created your project with the angular profile in Grails 3.2.0 or higher, this is done automatically.</p>
 </div>
 <div class="listingblock">
+<div class="title">build.gradle</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy"> buildscript {
      ...
@@ -576,11 +577,19 @@ table.CodeRay td.code>pre{padding:0}
 <h2 id="_usage">3. Usage</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To use this plugin, execute the <code>ngGenerateAll</code> command and pass the fully qualified path of a domain class</p>
+<p>To use this plugin, execute the <code>ngGenerateAll</code> command and pass the fully qualified path of a domain class.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="sh"> $ grails ngGenerateAll com.foo.Bar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also execute the command via Gradle.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="sh"> $ ./gradlew ngGenerateAll -Pargs=&quot;com.foo.Bar&quot;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -665,12 +674,12 @@ When generating assets for a domain class that already has a module and a JavaSc
 </div>
 </div>
 <div class="sect2">
-<h3 id="_supporting_module">3.3. Supporting module</h3>
+<h3 id="_core_module">3.3. Core Module</h3>
 <div class="paragraph">
-<p>If a module with the name "core" exists in the same directory that your module&#8217;s directory is in, the core module will be considered the "supporting module". Otherwise, the module for the domain being rendered will be considered the supporting module.</p>
+<p>If a module with the name "core" exists in the same directory that your module&#8217;s directory is in, the core module will be considered the "supporting module". Otherwise, the core module will be created for you.</p>
 </div>
 <div class="paragraph">
-<p>The directive to assist with file uploads, as well as the services to assist with domain conversions will be stored in what is calculated to be the supporting module. In addition, the core module will be defined as a dependency in the module being generated.</p>
+<p>The directive to assist with file uploads, as well as the services to assist with domain conversions will be stored in the core module. In addition, the core module will be defined as a dependency in the module being generated.</p>
 </div>
 <div class="paragraph">
 <p>Example:</p>
@@ -681,16 +690,93 @@ When generating assets for a domain class that already has a module and a JavaSc
 </div>
 </div>
 <div class="paragraph">
-<p>The scaffolding will look for <code>/grails-app/assets/javascripts/com/foo/core/com.foo.core.js</code>. If it is found, it will be the supporting module.</p>
+<p>The scaffolding will look for <code>/grails-app/assets/javascripts/com/foo/core/com.foo.core.js</code>.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_assumptions">3.4. Assumptions</h3>
 <div class="paragraph">
-<p>This plugin needs certain third party libraries to function and it assumes they are available. In addition to angular itself, the plugin relies on <a href="https://github.com/angular-ui/ui-router">ui-router</a> for routing.</p>
+<p>This plugin needs certain third party libraries to function and it assumes they are available. In addition to angular itself, the plugin relies on <a href="https://github.com/angular-ui/ui-router">ui-router</a> for routing and the Angular resource module for making REST calls.</p>
 </div>
 <div class="paragraph">
 <p>If you are using this plugin without the angular profile in Grails 3.2.0 or greater, it will be up to you to ensure those assets are available in the project. You can inform the plugin of their location with configuration.</p>
+</div>
+<div class="paragraph">
+<p>Here is how you might use the <a href="https://github.com/craigburke/client-dependencies-gradle">Client Dependencies</a> plugin to download the required assets automatically and put them in the place the scaffolding expects by default.</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> buildscript {
+     ...
+     dependencies {
+         classpath <span class="string"><span class="delimiter">&quot;</span><span class="content">com.craigburke.gradle:client-dependencies:1.1.1</span><span class="delimiter">&quot;</span></span>
+     }
+ }
+
+ apply <span class="key">plugin</span>:<span class="string"><span class="delimiter">&quot;</span><span class="content">com.craigburke.client-dependencies</span><span class="delimiter">&quot;</span></span>
+
+ clientDependencies {
+     npm {
+         <span class="string"><span class="delimiter">'</span><span class="content">angular</span><span class="delimiter">'</span></span>(<span class="string"><span class="delimiter">'</span><span class="content">1.5.x</span><span class="delimiter">'</span></span>, <span class="key">into</span>: <span class="string"><span class="delimiter">'</span><span class="content">angular</span><span class="delimiter">'</span></span>) {
+             include <span class="string"><span class="delimiter">'</span><span class="content">angular.js</span><span class="delimiter">'</span></span>
+         }
+         <span class="string"><span class="delimiter">'</span><span class="content">angular-resource</span><span class="delimiter">'</span></span>(<span class="string"><span class="delimiter">'</span><span class="content">1.5.x</span><span class="delimiter">'</span></span>, <span class="key">into</span>: <span class="string"><span class="delimiter">'</span><span class="content">angular</span><span class="delimiter">'</span></span>) {
+             include <span class="string"><span class="delimiter">'</span><span class="content">angular-resource.js</span><span class="delimiter">'</span></span>
+         }
+         <span class="string"><span class="delimiter">'</span><span class="content">angular-ui-router</span><span class="delimiter">'</span></span>(<span class="string"><span class="delimiter">'</span><span class="content">0.2.x</span><span class="delimiter">'</span></span>, <span class="key">into</span>: <span class="string"><span class="delimiter">'</span><span class="content">angular</span><span class="delimiter">'</span></span>, <span class="key">from</span>: <span class="string"><span class="delimiter">'</span><span class="content">release</span><span class="delimiter">'</span></span>) {
+             include <span class="string"><span class="delimiter">'</span><span class="content">angular-ui-router.js</span><span class="delimiter">'</span></span>
+         }
+     }
+ }</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_dependencies">3.4.1. Dependencies</h4>
+<div class="paragraph">
+<p>The generated scaffolding assumes the following asset pipeline plugins are being used in your project. If you are using the angular profile, the necessary dependencies are included by default.</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> dependencies {
+     ...
+     assets <span class="string"><span class="delimiter">&quot;</span><span class="content">com.craigburke.angular:angular-template-asset-pipeline:2.3.0</span><span class="delimiter">&quot;</span></span>
+     assets <span class="string"><span class="delimiter">&quot;</span><span class="content">com.craigburke.angular:angular-annotate-asset-pipeline:2.4.1</span><span class="delimiter">&quot;</span></span>
+     assets <span class="string"><span class="delimiter">&quot;</span><span class="content">com.craigburke:js-closure-wrap-asset-pipeline:1.2.0</span><span class="delimiter">&quot;</span></span>
+ }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>See the respective Github pages for more information on each of the plugins.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/craigburke/angular-annotate-asset-pipeline">Angular Annotate Asset Pipeline</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/craigburke/angular-template-asset-pipeline">Angular Template Asset Pipeline</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/craigburke/js-closure-wrap-asset-pipeline">JS Closure Wrap Asset Pipeline</a></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_dates">3.4.2. Dates</h4>
+<div class="paragraph">
+<p>In order for the scaffolding to work as designed, the databinding needs an additional date format to correctly parse date values sent by the client. The necessary format has been added by default in Grails 3.2.0.</p>
+</div>
+<div class="paragraph">
+<p>Here is an example on how to configure the format.</p>
+</div>
+<div class="listingblock">
+<div class="title">application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yaml"> <span class="key">grails</span>:
+     <span class="key">databinding</span>:
+         <span class="key">dateFormats</span>:
+             <span class="error">&quot;yyyy-MM-dd'T'HH:mm:ss.SSSX&quot;</span></code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -825,7 +911,7 @@ When generating assets for a domain class that already has a module and a JavaSc
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-28 19:33:09 UTC
+Last updated 2016-06-29 19:33:38 UTC
 </div>
 </div>
 </body>
