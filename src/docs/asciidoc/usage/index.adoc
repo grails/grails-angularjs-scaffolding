@@ -129,7 +129,7 @@ Here is an example on how to configure the format.
 grails:
     databinding:
         dateFormats:
-            "yyyy-MM-dd'T'HH:mm:ss.SSSX"
+            - "yyyy-MM-dd'T'HH:mm:ss.SSSX"
 ----
 
 === Routing
