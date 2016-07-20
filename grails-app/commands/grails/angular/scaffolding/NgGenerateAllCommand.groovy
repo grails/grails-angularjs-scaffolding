@@ -16,14 +16,19 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.model.types.ToMany
 import org.grails.scaffolding.registry.input.FileInputRenderer
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 
 class NgGenerateAllCommand implements GrailsApplicationCommand {
 
-    @Qualifier('grailsDomainClassMappingContext')
-    MappingContext mappingContext
-    
+    private MappingContext grailsDomainClassMappingContext
+
+    @Autowired
+    void setGrailsDomainClassMappingContext(@Qualifier('grailsDomainClassMappingContext') MappingContext mappingContext) {
+        this.grailsDomainClassMappingContext = mappingContext
+    }
+
     DomainModelService domainModelService
     DomainMarkupRenderer domainMarkupRenderer
     AngularModuleEditor angularModuleEditor
@@ -56,7 +61,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         boolean overwrite = (args[1] instanceof String && args[1].toLowerCase() == "true")
 
         try {
-            domainClass = mappingContext.getPersistentEntity(domainClassName)
+            domainClass = grailsDomainClassMappingContext.getPersistentEntity(domainClassName)
         } catch (e) {
             System.err.println("Error | The domain class you entered: \"${domainClassName}\" could not be found")
             return
