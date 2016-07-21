@@ -38,7 +38,7 @@ class AngularDomainHelperSpec extends Specification {
         ]
         UrlMappings urlMappings = Mock(UrlMappings) {
             1 * getReverseMapping("foo", "index", null, null, "GET", [:]) >> Mock(UrlCreator) {
-                1 * createURL([controller: "foo"], 'UTF8') >> "/bar"
+                1 * createRelativeURL("foo", "index", [:], 'UTF8') >> "/bar"
             }
         }
 
