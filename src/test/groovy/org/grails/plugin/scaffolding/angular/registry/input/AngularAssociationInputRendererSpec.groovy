@@ -43,7 +43,7 @@ class AngularAssociationInputRendererSpec extends ClosureCaptureSpecification {
         OneToMany | true
         OneToOne  | true
         ManyToOne | true
-        Basic     | true
+        Basic     | false
         Simple    | false
     }
 

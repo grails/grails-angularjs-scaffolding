@@ -2,19 +2,23 @@ package org.grails.plugin.scaffolding.angular.registry.input
 
 import grails.util.GrailsNameUtils
 import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.Association
+import org.grails.datastore.mapping.model.types.Basic
 import org.grails.datastore.mapping.model.types.ToMany
 import org.grails.scaffolding.model.property.DomainProperty
-import org.grails.scaffolding.registry.input.AssociationInputRenderer
+import org.grails.scaffolding.registry.DomainInputRenderer
 
-/**
- * Created by Jim on 5/25/2016.
- */
-class AngularAssociationInputRenderer extends AssociationInputRenderer {
+class AngularAssociationInputRenderer implements DomainInputRenderer {
 
     private String controllerName
 
     AngularAssociationInputRenderer(String controllerName) {
         this.controllerName = controllerName
+    }
+
+    boolean supports(DomainProperty property) {
+        PersistentProperty persistentProperty = property.persistentProperty
+        persistentProperty instanceof Association && !(persistentProperty instanceof Basic)
     }
 
     @Override
