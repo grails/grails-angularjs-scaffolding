@@ -72,8 +72,8 @@ trait AngularModelBuilder {
             this.packagePath = packageName.replace('.' as char, File.separatorChar).replaceAll('\\\\', '/')
             this.simpleName = this.className
             this.lowerCaseName = GrailsNameUtils.getScriptName(className)
-            this.moduleName = "${this.packageName}.${this.propertyName}"
-            this.modulePath = "${this.packagePath}/${this.propertyName}"
+            this.moduleName = this.packageName ? "${this.packageName}.${this.propertyName}" : this.propertyName
+            this.modulePath = this.packagePath ? "${this.packagePath}/${this.propertyName}" : this.propertyName
         }
 
         @Override
