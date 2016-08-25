@@ -1,6 +1,7 @@
 package org.grails.plugin.scaffolding.angular.registry
 
 import org.grails.plugin.scaffolding.angular.registry.input.AngularAssociationInputRenderer
+import org.grails.plugin.scaffolding.angular.registry.input.AngularBooleanInputRenderer
 import org.grails.plugin.scaffolding.angular.registry.input.AngularCurrencyInputRenderer
 import org.grails.plugin.scaffolding.angular.registry.input.AngularFileInputRenderer
 import org.grails.plugin.scaffolding.angular.registry.input.AngularTimeZoneInputRenderer
@@ -38,6 +39,7 @@ class AngularDomainRendererRegisterer {
         domainInputRendererRegistry.registerDomainRenderer(new AngularFileInputRenderer(), 0)
         domainInputRendererRegistry.registerDomainRenderer(new AngularCurrencyInputRenderer(), 0)
         domainInputRendererRegistry.registerDomainRenderer(new AngularBidirectionalToManyInputRenderer(controllerName), 0)
+        domainInputRendererRegistry.registerDomainRenderer(new AngularBooleanInputRenderer(), 0)
 
         domainOutputRendererRegistry.registerDomainRenderer(new AngularDefaultOutputRenderer(controllerName), 0)
         domainOutputRendererRegistry.registerDomainRenderer(new AngularDateOutputRenderer(controllerName), 0)

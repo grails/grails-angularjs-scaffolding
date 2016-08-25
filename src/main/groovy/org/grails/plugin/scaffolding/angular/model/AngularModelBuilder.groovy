@@ -88,6 +88,7 @@ trait AngularModelBuilder {
 
         @Override
         AngularModel getParentModule() {
+            println "${basePath}/${this.packagePath}/${this.packageName}.js"
             File file = new File("${basePath}/${this.packagePath}/${this.packageName}.js")
             if (file.exists()) {
                 new AngularModelImpl(this.packageName, this.basePath)

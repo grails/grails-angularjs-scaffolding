@@ -92,7 +92,7 @@ class AngularDomainRendererRegistererSpec extends Specification {
         }
 
         expect:
-        domainInputRendererRegistry.get(domainProperty) instanceof BooleanInputRenderer
+        domainInputRendererRegistry.get(domainProperty) instanceof AngularBooleanInputRenderer
     }
 
     void "test the InList renderer is returned for Number"() {
@@ -217,10 +217,10 @@ class AngularDomainRendererRegistererSpec extends Specification {
     void "test the BiDirectionalToMany renderer is returned"() {
         given:
         DomainProperty domainProperty = Stub(DomainProperty) {
+            getType() >> Set
             getPersistentProperty() >> Stub(OneToMany) {
                 isBidirectional() >> true
             }
-
         }
 
         expect:
