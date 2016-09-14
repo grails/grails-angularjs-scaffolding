@@ -1,4 +1,4 @@
-class BootStrap {
+class GrailsAngularScaffoldingBootStrap {
 
     def init = { servletContext ->
     }
