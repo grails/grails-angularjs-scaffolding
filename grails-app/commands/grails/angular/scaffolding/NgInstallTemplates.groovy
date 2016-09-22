@@ -1,13 +1,9 @@
 package grails.angular.scaffolding
 
-import groovy.io.FileType
 import org.grails.io.support.Resource
 import org.grails.io.support.SpringIOUtils
 import org.grails.plugin.scaffolding.command.GrailsApplicationCommand
 
-/**
- * Created by Jim on 6/17/2016.
- */
 class NgInstallTemplates implements GrailsApplicationCommand {
 
     @Override
