@@ -7,3 +7,6 @@ org.grails.plugin.scaffolding.angular.registry
 org.grails.plugin.scaffolding.angular.registry.input
 org.grails.plugin.scaffolding.angular.registry.output
 org.grails.plugin.scaffolding.angular.template
+org.grails.plugin.scaffolding.command
+org.grails.plugin.scaffolding.io
+org.grails.plugin.scaffolding.template
