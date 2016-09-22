@@ -37,7 +37,7 @@ This plugin provides the ability to generate an AngularJS CRUD interface based o
 
         angularJsonMarshaller(AngularJsonMarshaller)
 
-        angulardDomainRendererRegisterer(AngularDomainRendererRegisterer)
+        angularDomainRendererRegisterer(AngularDomainRendererRegisterer)
 
     }}
 

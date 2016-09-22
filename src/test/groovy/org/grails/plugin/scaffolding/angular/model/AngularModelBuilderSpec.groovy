@@ -5,12 +5,12 @@ import spock.lang.Specification
 /**
  * Created by Jim on 8/25/2016.
  */
-class AngularModelBuilderSpec extends Specification {
-
-    @Delegate
-    AngularModelBuilder angularModelBuilder = new AngularModelBuilder(basePath: "src/test/resources")
+class AngularModelBuilderSpec extends Specification implements AngularModelBuilder {
 
     void "test getFile"() {
+        given:
+        basePath = "src/test/resources"
+
         expect:
         model("com.foo.Bar").modulePath == "com/foo/bar"
         model("com.Foo").modulePath == "com/foo"

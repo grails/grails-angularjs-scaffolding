@@ -13,7 +13,6 @@ plugins {
 }
 
 version "1.0.1.BUILD-SNAPSHOT"
-group "org.grails.plugins"
 
 apply plugin:"eclipse"
 apply plugin:"idea"

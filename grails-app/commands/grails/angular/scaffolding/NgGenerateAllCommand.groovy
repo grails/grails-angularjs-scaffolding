@@ -1,10 +1,9 @@
 package grails.angular.scaffolding
 
-import grails.dev.commands.GrailsApplicationCommand
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.plugin.scaffolding.angular.markup.AngularPropertyMarkupRenderer
+import org.grails.plugin.scaffolding.command.GrailsApplicationCommand
 import org.grails.plugin.scaffolding.angular.model.AngularModel
-import org.grails.plugin.scaffolding.angular.model.AngularModelBuilder
 import org.grails.scaffolding.markup.DomainMarkupRenderer
 import org.grails.scaffolding.model.DomainModelService
 import org.grails.scaffolding.model.property.DomainProperty
@@ -37,7 +36,6 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
     AngularPropertyMarkupRenderer propertyMarkupRenderer
 
     private PersistentEntity domainClass
-    private AngularModelBuilder modelBuilder = new AngularModelBuilder()
 
     @Value('${grails.codegen.angular.baseDir:grails-app/assets}')
     String baseDir
@@ -54,12 +52,9 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
     @Value('${grails.codegen.angular.ngResourcePath:/angular/angular-resource}')
     String ngResourcePath
 
-    private String basePath
-
     @Override
     boolean handle() {
-        basePath = "$baseDir/$assetPath"
-        modelBuilder.basePath = basePath
+        this.basePath = "$baseDir/$assetPath"
 
         String domainClassName = args[0]
 
@@ -83,11 +78,11 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
             prop instanceof Association
         }
 
-        AngularModel module = modelBuilder.model(domainClass.javaClass)
+        AngularModel module = model(domainClass.javaClass)
 
         Map dependencies = ['"ui.router"': uiRouterPath, '"ngResource"': ngResourcePath]
 
-        AngularModel coreModule = modelBuilder.model("${module.packageName}.Core")
+        AngularModel coreModule = model("${module.packageName}.Core")
 
         render template: template('angular/javascripts/coreModule.js'),
                 destination: coreModule.file,
@@ -212,7 +207,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
     }
 
     AngularModel handleAssociatedProperty(DomainProperty property) {
-        AngularModel module = modelBuilder.model(property.associatedType)
+        AngularModel module = model(property.associatedType)
         PersistentEntity domainClass = property.associatedEntity
         final String controllerName = propertyMarkupRenderer.controllerName
 
@@ -225,7 +220,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
         Map dependencies = [:]
 
-        AngularModel coreModule = modelBuilder.model("${module.packageName}.Core")
+        AngularModel coreModule = model("${module.packageName}.Core")
         if (coreModule.exists()) {
             dependencies["\"${coreModule.moduleName}\""] = "/${coreModule.modulePath}/${coreModule.moduleName}"
         }

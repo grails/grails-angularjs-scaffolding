@@ -8,7 +8,7 @@ import org.grails.io.support.GrailsResourceUtils
 import org.grails.io.support.Resource
 
 
-class AngularModelBuilder {
+trait AngularModelBuilder {
 
     String basePath
     /**
