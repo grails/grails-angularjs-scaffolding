@@ -12,7 +12,7 @@ plugins {
     id 'org.asciidoctor.convert' version '1.5.3'
 }
 
-version "1.0.1.BUILD-SNAPSHOT"
+version "1.0.2"
 group "org.grails.plugins"
 
 apply plugin:"eclipse"
@@ -43,7 +43,7 @@ dependencies {
     provided "org.springframework.boot:spring-boot-starter-tomcat"
     provided "org.grails:grails-dependencies"
     compile "org.grails:scaffolding-core:$scaffoldingCoreVersion"
-    profile "org.grails.profiles:plugin:3.2.0.BUILD-SNAPSHOT"
+    profile "org.grails.profiles:plugin:3.2.1"
     testCompile "org.grails:grails-plugin-testing"
     documentation "org.codehaus.groovy:groovy-all:2.4.6"
 }
@@ -53,7 +53,7 @@ task wrapper(type: Wrapper) {
 }
 grailsPublish {
     userOrg = "grails"
-    githubSlug = 'grails-plugins/grails-angular-scaffolding'
+    githubSlug = 'grails-plugins/grails-angularjs-scaffolding'
     license {
         name = 'Apache-2.0'
     }
