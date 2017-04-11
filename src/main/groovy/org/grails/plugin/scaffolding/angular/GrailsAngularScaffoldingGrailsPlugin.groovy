@@ -14,17 +14,17 @@ class GrailsAngularScaffoldingGrailsPlugin extends Plugin {
     def grailsVersion = "3.1.0 > *"
 
     // TODO Fill in these fields
-    def title = "Grails Angular Scaffolding" // Headline output name of the plugin
+    def title = "Grails AngularJS Scaffolding" // Headline output name of the plugin
     def author = "James Kleeh"
     def authorEmail = "kleehj@ociweb.com"
     def description = '''\
 This plugin provides the ability to generate an AngularJS CRUD interface based on a domain class
 '''
-    String documentation = 'http://grails-plugins.github.io/grails-angular-scaffolding/latest'
+    String documentation = 'http://grails-plugins.github.io/grails-angularjs-scaffolding/latest'
     String license = 'APACHE'
     def organization = [name: 'Grails', url: 'http://www.grails.org/']
-    def issueManagement = [url: 'https://github.com/grails-plugins/grails-angular-scaffolding/issues']
-    def scm = [url: 'https://github.com/grails-plugins/grails-angular-scaffolding']
+    def issueManagement = [url: 'https://github.com/grails-plugins/grails-angularjs-scaffolding/issues']
+    def scm = [url: 'https://github.com/grails-plugins/grails-angularjs-scaffolding']
 
     Closure doWithSpring() { {->
         scaffoldingCoreConfig(ScaffoldingBeanConfiguration)

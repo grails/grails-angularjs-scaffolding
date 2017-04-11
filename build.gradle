@@ -12,7 +12,7 @@ plugins {
     id 'org.asciidoctor.convert' version '1.5.3'
 }
 
-version "1.0.2"
+version "1.0.3"
 group "org.grails.plugins"
 
 apply plugin:"eclipse"
@@ -84,7 +84,7 @@ task apidocs(type: Groovydoc) {
 
     destinationDir = new File(buildDir, 'docs/api')
     // Might need a classpath
-    docTitle = "Grails Angular Scaffolding ${version}"
+    docTitle = "Grails AngularJS Scaffolding ${version}"
 
     classpath = configurations.documentation
     groovyClasspath = configurations.documentation
