@@ -1,27 +1,17 @@
-buildscript {
-    repositories {
-        mavenLocal()
-        maven { url "https://repo.grails.org/grails/core" }
-    }
-    dependencies {
-        classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-    }
-}
-
 plugins {
     id 'org.asciidoctor.convert' version '1.5.3'
+    id 'eclipse'
+    id 'idea'
+    id 'java-library'
+    id 'org.grails.grails-plugin'
+    id 'org.grails.internal.grails-plugin-publish'
 }
 
 version project.projectVersion
 group "org.grails.plugins"
 
-apply plugin: "eclipse"
-apply plugin: "idea"
-apply plugin: "org.grails.grails-plugin"
-apply plugin: "org.grails.internal.grails-plugin-publish"
-
 repositories {
-    mavenLocal()
+    mavenCentral()
     maven { url "https://repo.grails.org/grails/core" }
 }
 
@@ -40,18 +30,18 @@ configurations {
 }
 
 dependencies {
-    provided 'org.springframework.boot:spring-boot-starter-logging'
-    provided "org.springframework.boot:spring-boot-starter-actuator"
-    provided "org.springframework.boot:spring-boot-autoconfigure"
-    provided "org.springframework.boot:spring-boot-starter-tomcat"
-    provided "org.grails:grails-dependencies"
+    api 'org.springframework.boot:spring-boot-starter-logging'
+    api "org.springframework.boot:spring-boot-starter-actuator"
+    api "org.springframework.boot:spring-boot-autoconfigure"
+    api "org.springframework.boot:spring-boot-starter-tomcat"
+    api "org.grails:grails-dependencies"
+    api "org.grails:scaffolding-core:$scaffoldingCoreVersion"
     console "org.grails:grails-console"
-    compile "org.grails:scaffolding-core:$scaffoldingCoreVersion"
     profile "org.grails.profiles:plugin"
-    testCompile("org.spockframework:spock-core:${spockVersion}") {
+    testImplementation("org.spockframework:spock-core:${spockVersion}") {
         exclude group:'org.codehaus.groovy', module: 'groovy-all'
     }
-    documentation "org.codehaus.groovy:groovy-all:$groovyVersion"
+    documentation "org.codehaus.groovy:groovy-all"
 }
 
 bootRun {
